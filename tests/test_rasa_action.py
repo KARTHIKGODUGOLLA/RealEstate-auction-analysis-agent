@@ -28,7 +28,7 @@ class RasaActionTest(unittest.TestCase):
             {
                 "property_address": "6013 Fender Court",
                 "city": "Orlando",
-                "current_bid": "135000",
+            "current_bid": "170000",
                 "available_cash": "40000",
                 "investment_goal": "long-term rental",
                 "financing_type": "hard money or DSCR loan",

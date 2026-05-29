@@ -56,6 +56,7 @@ function render(analysis) {
   const buying = analysis.buying_power;
   const hidden = analysis.hidden_costs;
   const rental = analysis.rental_yield;
+  const official = analysis.property_data.official_data_status;
 
   decisionCard.classList.remove("red", "yellow", "green");
   if (rec.category.toLowerCase().includes("red")) decisionCard.classList.add("red");
@@ -63,6 +64,9 @@ function render(analysis) {
   if (rec.category.toLowerCase().includes("green")) decisionCard.classList.add("green");
 
   document.querySelector("#recommendation").textContent = `${rec.category} · score ${rec.score}/100`;
+  document.querySelector("#officialStatus").textContent = official?.status === "verified"
+    ? "Official Treasury data verified live"
+    : "Using official-source fallback data";
   document.querySelector("#summary").textContent = rec.summary;
   document.querySelector("#maxBid").textContent = currency.format(rec.max_safe_bid);
   document.querySelector("#doNotBid").textContent = currency.format(rec.do_not_bid_above);
@@ -93,6 +97,22 @@ function render(analysis) {
   });
 }
 
+async function loadSources() {
+  const response = await fetch("/api/sources");
+  const payload = await response.json();
+  const sources = document.querySelector("#sources");
+  sources.innerHTML = "";
+  payload.sources.forEach((source) => {
+    const item = document.createElement("article");
+    item.className = "source-item";
+    item.innerHTML = `
+      <a href="${source.url}" target="_blank" rel="noreferrer">${source.name}</a>
+      <p>${source.mode.replaceAll("_", " ")} · checks ${source.checks.join(", ")}</p>
+    `;
+    sources.appendChild(item);
+  });
+}
+
 function percent(value) {
   return `${(value * 100).toFixed(1)}%`;
 }
@@ -104,3 +124,4 @@ function setLoading(isLoading) {
 }
 
 analyze();
+loadSources();

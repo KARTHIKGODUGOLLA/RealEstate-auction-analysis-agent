@@ -8,6 +8,7 @@ from copy import deepcopy
 from typing import Any
 
 from auction_agent.data import BUYER_PROFILE, PROPERTIES
+from auction_agent.official_data import apply_official_overrides
 from auction_agent.widgets import (
     BuyingPowerResult,
     HiddenCostsResult,
@@ -34,10 +35,13 @@ def analyze_auction(
     property_id: str = "6013-fender-court",
     property_overrides: dict[str, Any] | None = None,
     profile_overrides: dict[str, Any] | None = None,
+    use_official_data: bool = True,
 ) -> AuctionAnalysis:
     """Run the full analysis for a seeded property id."""
     property_data = deepcopy(PROPERTIES[property_id])
     profile = deepcopy(BUYER_PROFILE)
+    if use_official_data:
+        property_data = apply_official_overrides(property_data)
     if property_overrides:
         property_data.update({key: value for key, value in property_overrides.items() if value is not None})
     if profile_overrides:

@@ -36,7 +36,7 @@
             </label>
             <label>
               Current bid
-              <input name="currentBid" type="number" value="135000" />
+              <input name="currentBid" type="number" value="170000" />
             </label>
           </div>
           <div class="grid-2">
@@ -84,6 +84,7 @@
           <div class="decision-card" id="decisionCard">
             <p class="label">Recommendation</p>
             <h2 id="recommendation">Waiting for analysis</h2>
+            <p id="officialStatus" class="official-status">Official data status will appear here.</p>
             <p id="summary">Enter the auction details and run the analysis.</p>
             <div class="bid-row">
               <div>
@@ -126,6 +127,14 @@
               <h3>What could go wrong?</h3>
             </div>
             <div id="checklist" class="checklist"></div>
+          </section>
+
+          <section class="source-panel">
+            <div class="section-heading">
+              <p class="label">Official data sources</p>
+              <h3>Government portals used for diligence</h3>
+            </div>
+            <div id="sources" class="source-list"></div>
           </section>
         </section>
       </section>

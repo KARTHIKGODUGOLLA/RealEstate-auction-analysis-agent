@@ -29,6 +29,7 @@ def render_report(analysis: AuctionAnalysis) -> str:
             f"required deposit is ${prop['required_deposit']:,.0f}; closing deadline is "
             f"{prop['closing_deadline_days']} days. Sale is as-is and should be treated "
             "as no-financing-contingency until verified.",
+            _official_status_line(prop),
             "",
             "Buying Power:",
             buying.summary,
@@ -59,4 +60,13 @@ def render_report(analysis: AuctionAnalysis) -> str:
             "Next Steps:",
             *next_steps,
         ]
-    )
+)
+
+
+def _official_status_line(prop: dict) -> str:
+    status = prop.get("official_data_status")
+    if not status:
+        return "Official data: seeded fallback."
+    if status.get("status") == "verified":
+        return f"Official data: verified from Treasury page ({status.get('url')})."
+    return f"Official data: unavailable live; using fallback. Reason: {status.get('error', 'unknown')}"
