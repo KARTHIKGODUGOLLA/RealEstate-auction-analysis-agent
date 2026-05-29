@@ -87,6 +87,20 @@
         </form>
 
         <section class="results">
+          <section class="rasa-panel">
+            <div class="section-heading">
+              <p class="label">Rasa conversation</p>
+              <h3>Ask through the Rasa agent</h3>
+            </div>
+            <div id="rasaTranscript" class="rasa-transcript">
+              <div class="message agent">Start `make run-actions` and `make rasa`, then send the prompt here.</div>
+            </div>
+            <div class="rasa-compose">
+              <input id="rasaMessage" value="Analyze OC-2026-1001. I have 40000 cash and want a long-term rental." />
+              <button id="rasaSend" type="button">Send</button>
+            </div>
+          </section>
+
           <div class="decision-card" id="decisionCard">
             <p class="label">Recommendation</p>
             <h2 id="recommendation">Waiting for analysis</h2>

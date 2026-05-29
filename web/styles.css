@@ -111,7 +111,8 @@ h1 {
 .input-panel,
 .decision-card,
 .widget,
-.checklist-panel {
+.checklist-panel,
+.rasa-panel {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
@@ -178,6 +179,62 @@ textarea {
 .decision-card {
   padding: 22px;
   border-top: 7px solid var(--blue);
+}
+
+.rasa-panel {
+  padding: 18px;
+}
+
+.rasa-transcript {
+  display: grid;
+  gap: 10px;
+  max-height: 300px;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #f8faf9;
+}
+
+.message {
+  width: fit-content;
+  max-width: min(680px, 100%);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #243139;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.message.user {
+  justify-self: end;
+  background: #dfeaf7;
+}
+
+.message.agent {
+  justify-self: start;
+  background: #eef4ef;
+}
+
+.message.error {
+  background: #fde8e5;
+  color: var(--red);
+}
+
+.rasa-compose {
+  display: grid;
+  grid-template-columns: 1fr 92px;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.rasa-compose button {
+  border: 0;
+  border-radius: 8px;
+  background: var(--teal);
+  color: white;
+  cursor: pointer;
+  font-weight: 800;
 }
 
 .decision-card.red {
@@ -378,7 +435,8 @@ textarea {
   .grid-2,
   .widgets,
   .bid-row,
-  .check-item {
+  .check-item,
+  .rasa-compose {
     grid-template-columns: 1fr;
   }
 

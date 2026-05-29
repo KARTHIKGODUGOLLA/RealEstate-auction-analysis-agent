@@ -7,6 +7,8 @@ from dataclasses import asdict, is_dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
+from urllib.error import URLError
+from urllib.request import Request, urlopen
 
 from auction_agent.engine import analyze_auction
 from auction_agent.memory import save_analysis, update_buyer_profile
@@ -47,6 +49,9 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
         self.send_error(404, "Not found")
 
     def do_POST(self) -> None:
+        if self.path == "/api/rasa-chat":
+            self._proxy_rasa_message()
+            return
         if self.path != "/api/analyze":
             self.send_error(404, "Not found")
             return
@@ -74,6 +79,35 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
         update_buyer_profile(profile_overrides)
         save_analysis(analysis)
         body = json.dumps(_serialize_analysis(analysis)).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _proxy_rasa_message(self) -> None:
+        length = int(self.headers.get("Content-Length", "0"))
+        payload = json.loads(self.rfile.read(length) or b"{}")
+        message = payload.get("message", "")
+        sender = payload.get("sender", "web-demo")
+        rasa_payload = json.dumps({"sender": sender, "message": message}).encode("utf-8")
+        request = Request(
+            "http://127.0.0.1:5005/webhooks/rest/webhook",
+            data=rasa_payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urlopen(request, timeout=30) as response:
+                body = response.read()
+        except (OSError, URLError) as exc:
+            body = json.dumps(
+                {
+                    "error": "Rasa is not reachable. Start it with `make rasa` while `make run-actions` is running.",
+                    "detail": str(exc),
+                }
+            ).encode("utf-8")
+
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))

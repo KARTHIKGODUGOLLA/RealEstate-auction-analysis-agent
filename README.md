@@ -17,6 +17,11 @@ python3 -m auction_agent.web
 
 Then open http://127.0.0.1:8787
 
+The dashboard has two paths:
+- `Analyze auction` calls the local deterministic engine directly.
+- `Rasa conversation` sends messages to Rasa at `localhost:5005`, so run
+  `make run-actions` and `make rasa` first.
+
 ## CLI
 
 ```bash

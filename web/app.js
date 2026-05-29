@@ -3,6 +3,9 @@ const decisionCard = document.querySelector("#decisionCard");
 const voiceButton = document.querySelector("#voiceButton");
 const voiceStatus = document.querySelector("#voiceStatus");
 const propertySelect = document.querySelector("#propertySelect");
+const rasaTranscript = document.querySelector("#rasaTranscript");
+const rasaMessage = document.querySelector("#rasaMessage");
+const rasaSend = document.querySelector("#rasaSend");
 
 const currency = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -13,6 +16,17 @@ const currency = new Intl.NumberFormat("en-US", {
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   await analyze();
+});
+
+rasaSend.addEventListener("click", async () => {
+  await sendRasaMessage();
+});
+
+rasaMessage.addEventListener("keydown", async (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    await sendRasaMessage();
+  }
 });
 
 propertySelect.addEventListener("change", () => {
@@ -61,6 +75,45 @@ async function analyze() {
   const analysis = await response.json();
   render(analysis);
   setLoading(false);
+}
+
+async function sendRasaMessage() {
+  const message = rasaMessage.value.trim();
+  if (!message) return;
+  appendMessage("user", message);
+  rasaMessage.value = "";
+  rasaSend.disabled = true;
+  rasaSend.textContent = "...";
+  try {
+    const response = await fetch("/api/rasa-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sender: "web-demo", message }),
+    });
+    const payload = await response.json();
+    if (payload.error) {
+      appendMessage("error", `${payload.error}\n${payload.detail || ""}`.trim());
+      return;
+    }
+    if (!payload.length) {
+      appendMessage("agent", "Rasa returned no messages. It may be waiting for another turn.");
+      return;
+    }
+    payload.forEach((item) => appendMessage("agent", item.text || JSON.stringify(item)));
+  } catch (error) {
+    appendMessage("error", `Could not reach the local Rasa proxy: ${error.message}`);
+  } finally {
+    rasaSend.disabled = false;
+    rasaSend.textContent = "Send";
+  }
+}
+
+function appendMessage(kind, text) {
+  const bubble = document.createElement("div");
+  bubble.className = `message ${kind}`;
+  bubble.textContent = text;
+  rasaTranscript.appendChild(bubble);
+  rasaTranscript.scrollTop = rasaTranscript.scrollHeight;
 }
 
 async function loadProperties() {
