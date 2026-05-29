@@ -33,7 +33,17 @@ cp .env.example .env
 # Fill NEBIUS_API_KEY from Token Factory.
 # Recommended command-generator model:
 # NEBIUS_MODEL_ID=Qwen/Qwen3-235B-A22B-Instruct-2507
-python3 -m pip install -e ".[rasa]"
+
+# Rasa requires Python >=3.10,<3.12. Use Python 3.11.
+python3.11 -m venv .venv
+source .venv/bin/activate
+python -m pip install -U pip setuptools wheel
+python -m pip install -e ".[rasa]"
+
+set -a
+source .env
+set +a
+
 make list-nebius-models
 make check-nebius
 make train
