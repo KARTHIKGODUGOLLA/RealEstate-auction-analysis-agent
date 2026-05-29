@@ -6,6 +6,9 @@ const propertySelect = document.querySelector("#propertySelect");
 const rasaTranscript = document.querySelector("#rasaTranscript");
 const rasaMessage = document.querySelector("#rasaMessage");
 const rasaSend = document.querySelector("#rasaSend");
+const askDecision = document.querySelector("#askDecision");
+const askRisks = document.querySelector("#askRisks");
+const askMaxBid = document.querySelector("#askMaxBid");
 
 const currency = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -27,6 +30,18 @@ rasaMessage.addEventListener("keydown", async (event) => {
     event.preventDefault();
     await sendRasaMessage();
   }
+});
+
+askDecision.addEventListener("click", async () => {
+  await sendRasaMessage("Should I bid on the selected property?");
+});
+
+askRisks.addEventListener("click", async () => {
+  await sendRasaMessage("What could go wrong with this auction property?");
+});
+
+askMaxBid.addEventListener("click", async () => {
+  await sendRasaMessage("Explain my maximum safe bid for this property.");
 });
 
 propertySelect.addEventListener("change", () => {
@@ -77,9 +92,10 @@ async function analyze() {
   setLoading(false);
 }
 
-async function sendRasaMessage() {
-  const message = rasaMessage.value.trim();
+async function sendRasaMessage(quickMessage = null) {
+  const message = (quickMessage || rasaMessage.value).trim();
   if (!message) return;
+  const enrichedMessage = enrichForSelectedProperty(message);
   appendMessage("user", message);
   rasaMessage.value = "";
   rasaSend.disabled = true;
@@ -88,7 +104,7 @@ async function sendRasaMessage() {
     const response = await fetch("/api/rasa-chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sender: "web-demo", message }),
+      body: JSON.stringify({ sender: "web-demo", message: enrichedMessage }),
     });
     const payload = await response.json();
     if (payload.error) {
@@ -106,6 +122,32 @@ async function sendRasaMessage() {
     rasaSend.disabled = false;
     rasaSend.textContent = "Send";
   }
+}
+
+function enrichForSelectedProperty(message) {
+  const selected = propertySelect.selectedOptions[0];
+  const parcel = propertySelect.value;
+  const address = selected?.dataset.address || form.elements.address.value;
+  const currentBid = form.elements.currentBid.value;
+  const availableCash = form.elements.availableCash.value;
+  const investmentGoal = form.elements.investmentGoal.value;
+  const financingType = form.elements.financingType.value;
+  const repairs = form.elements.estimatedRepairs.value;
+  const rent = form.elements.marketRent.value;
+
+  return [
+    message,
+    "",
+    "Use these selected dashboard details:",
+    parcel ? `Parcel/property id: ${parcel}` : `Property address: ${address}`,
+    `Address: ${address}`,
+    `Current bid: ${currentBid}`,
+    `Available cash: ${availableCash}`,
+    `Investment goal: ${investmentGoal}`,
+    `Financing type: ${financingType}`,
+    repairs ? `Estimated repairs: ${repairs}` : null,
+    rent ? `Market rent: ${rent}` : null,
+  ].filter(Boolean).join("\n");
 }
 
 function appendMessage(kind, text) {

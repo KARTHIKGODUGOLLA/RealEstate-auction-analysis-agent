@@ -90,13 +90,18 @@
           <section class="rasa-panel">
             <div class="section-heading">
               <p class="label">Rasa conversation</p>
-              <h3>Ask through the Rasa agent</h3>
+              <h3>Auction advisor chat</h3>
+            </div>
+            <div class="quick-actions">
+              <button id="askDecision" type="button">Should I bid?</button>
+              <button id="askRisks" type="button">What could go wrong?</button>
+              <button id="askMaxBid" type="button">Explain max bid</button>
             </div>
             <div id="rasaTranscript" class="rasa-transcript">
-              <div class="message agent">Start `make run-actions` and `make rasa`, then send the prompt here.</div>
+              <div class="message agent">Select a property, then ask me whether to bid. I will use the selected deal details and your buyer profile.</div>
             </div>
             <div class="rasa-compose">
-              <input id="rasaMessage" value="Analyze OC-2026-1001. I have 40000 cash and want a long-term rental." />
+              <input id="rasaMessage" placeholder="Ask about the selected auction property..." />
               <button id="rasaSend" type="button">Send</button>
             </div>
           </section>
