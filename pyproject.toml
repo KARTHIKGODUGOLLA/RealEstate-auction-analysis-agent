@@ -2,10 +2,14 @@
 name = "auction-analysis-agent"
 version = "0.1.0"
 description = "Auction due diligence analysis engine for a voice AI app."
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.12"
 dependencies = []
 
 [project.optional-dependencies]
+rasa = [
+    "rasa-pro~=3.16.0",
+    "python-dotenv>=1.0.0",
+]
 dev = ["pytest>=8.0"]
 
 [tool.pytest.ini_options]

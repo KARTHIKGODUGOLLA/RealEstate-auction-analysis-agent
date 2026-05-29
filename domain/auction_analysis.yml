@@ -1,0 +1,66 @@
+version: "3.1"
+
+slots:
+  property_address:
+    type: text
+    mappings:
+      - type: from_llm
+  city:
+    type: text
+    mappings:
+      - type: from_llm
+  current_bid:
+    type: float
+    mappings:
+      - type: from_llm
+  available_cash:
+    type: float
+    mappings:
+      - type: from_llm
+  estimated_repairs:
+    type: float
+    mappings:
+      - type: from_llm
+  market_rent:
+    type: float
+    mappings:
+      - type: from_llm
+  investment_goal:
+    type: categorical
+    values:
+      - long-term rental
+      - flip
+      - Airbnb
+      - resale
+    mappings:
+      - type: from_llm
+  financing_type:
+    type: categorical
+    values:
+      - hard money or DSCR loan
+      - cash
+      - conventional
+      - private lender
+    mappings:
+      - type: from_llm
+
+actions:
+  - action_analyze_auction_property
+
+responses:
+  utter_ask_property_address:
+    - text: "What property address or auction link should I analyze?"
+  utter_ask_city:
+    - text: "What city or county is the property in?"
+  utter_ask_investment_goal:
+    - text: "Are you evaluating this as a long-term rental, flip, Airbnb, or resale?"
+  utter_ask_available_cash:
+    - text: "How much cash do you have available for deposit, closing costs, repairs, and reserves?"
+  utter_ask_current_bid:
+    - text: "What is the current bid or target bid?"
+  utter_ask_estimated_repairs:
+    - text: "What repair budget should I assume? If you are not sure, give me a conservative estimate."
+  utter_ask_market_rent:
+    - text: "What monthly rent should I use for the rental yield estimate?"
+  utter_ask_financing_type:
+    - text: "How would you finance it: cash, hard money or DSCR loan, conventional, or private lender?"

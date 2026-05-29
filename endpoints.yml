@@ -1,0 +1,19 @@
+action_endpoint:
+  actions_module: "actions"
+
+model_groups:
+  - id: nebius_command_llm
+    models:
+      - provider: self-hosted
+        model: Qwen/Qwen3-235B-A22B-Instruct-2507
+        api_base: "https://api.tokenfactory.nebius.com/v1"
+        api_key: ${NEBIUS_API_KEY}
+        temperature: 0.0
+        max_tokens: 1024
+        timeout: 30
+
+nlg:
+  type: rephrase
+  summarize_history: false
+  llm:
+    model_group: nebius_command_llm

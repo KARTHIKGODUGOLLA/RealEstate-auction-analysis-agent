@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from auction_agent.engine import analyze_auction
+from auction_agent.memory import save_analysis, update_buyer_profile
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC_DIR = ROOT / "web"
@@ -52,6 +53,8 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
             property_overrides=property_overrides,
             profile_overrides=profile_overrides,
         )
+        update_buyer_profile(profile_overrides)
+        save_analysis(analysis)
         body = json.dumps(_serialize_analysis(analysis)).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json")

@@ -1,0 +1,17 @@
+flows:
+  auction_analysis:
+    description: >
+      Analyze a real estate auction property before bidding. Use this when the
+      user asks whether to bid, what their maximum bid should be, whether the
+      auction is risky, what could go wrong, or whether the property works as a
+      rental, Airbnb, flip, or resale opportunity.
+    steps:
+      - collect: property_address
+      - collect: city
+      - collect: current_bid
+      - collect: available_cash
+      - collect: investment_goal
+      - collect: financing_type
+      - collect: estimated_repairs
+      - collect: market_rent
+      - action: action_analyze_auction_property

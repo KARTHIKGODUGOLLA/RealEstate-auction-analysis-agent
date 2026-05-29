@@ -23,6 +23,22 @@ Then open http://127.0.0.1:8787
 python3 -m auction_agent.cli analyze
 ```
 
+## Rasa Layer
+
+This repo now includes a Rasa CALM flow and custom action wrapper around the
+analysis engine:
+
+```bash
+python3 -m pip install -e ".[rasa]"
+make train
+make run-actions
+make rasa
+```
+
+The flow collects auction details, calls `action_analyze_auction_property`, saves
+the buyer profile, stores the completed analysis in `.data/`, and returns the
+same four-widget recommendation used by the UI.
+
 ## Current Slice
 
 - Buying Power: safe max bid, cash needed, reserve pressure.
@@ -30,6 +46,7 @@ python3 -m auction_agent.cli analyze
 - Rental Yield: cash flow, cap rate, cash-on-cash, break-even rent.
 - Personalized Recommendation: Green / Yellow / Red with max bid guidance.
 - Web UI: editable deal assumptions, browser voice input, four-widget cockpit.
+- Rasa flow/action: structured intake, deterministic analysis, persistent memory.
 
 ## Demo Prompt
 

@@ -1,0 +1,14 @@
+recipe: default.v1
+language: en
+
+assistant_id: auction_due_diligence_agent
+
+pipeline:
+  - name: CompactLLMCommandGenerator
+    llm:
+      model_group: nebius_command_llm
+    flow_retrieval:
+      active: false
+
+policies:
+  - name: FlowPolicy
