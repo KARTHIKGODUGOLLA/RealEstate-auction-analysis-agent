@@ -7,7 +7,17 @@ This repo starts with the analysis engine. It is intentionally small: one seeded
 property, one buyer profile, and four deterministic widgets that produce a clear
 recommendation.
 
-## Quickstart
+## Quickstart: Web Demo
+
+The web UI is the best hackathon demo surface.
+
+```bash
+python3 -m auction_agent.web
+```
+
+Then open http://127.0.0.1:8787
+
+## CLI
 
 ```bash
 python3 -m auction_agent.cli analyze
@@ -19,6 +29,7 @@ python3 -m auction_agent.cli analyze
 - Hidden Costs: official-source checklist and risk summary.
 - Rental Yield: cash flow, cap rate, cash-on-cash, break-even rent.
 - Personalized Recommendation: Green / Yellow / Red with max bid guidance.
+- Web UI: editable deal assumptions, browser voice input, four-widget cockpit.
 
 ## Demo Prompt
 

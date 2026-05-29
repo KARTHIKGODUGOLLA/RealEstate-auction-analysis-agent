@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Auction Advisor</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Voice auction due diligence</p>
+          <h1>Auction Advisor</h1>
+          <p class="lede">Should I bid, how much should I bid, and what could go wrong?</p>
+        </div>
+        <div class="voice-panel">
+          <button id="voiceButton" class="voice-button" type="button" aria-label="Start voice input">
+            <span class="mic-dot"></span>
+            <span>Ask by voice</span>
+          </button>
+          <p id="voiceStatus">Voice input uses your browser when available. Text works as backup.</p>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <form id="analysisForm" class="input-panel">
+          <label>
+            Property address
+            <input name="address" value="6013 Fender Court" />
+          </label>
+          <div class="grid-2">
+            <label>
+              City
+              <input name="city" value="Orlando" />
+            </label>
+            <label>
+              Current bid
+              <input name="currentBid" type="number" value="135000" />
+            </label>
+          </div>
+          <div class="grid-2">
+            <label>
+              Available cash
+              <input name="availableCash" type="number" value="40000" />
+            </label>
+            <label>
+              Repairs estimate
+              <input name="estimatedRepairs" type="number" value="5000" />
+            </label>
+          </div>
+          <div class="grid-2">
+            <label>
+              Market rent
+              <input name="marketRent" type="number" value="2200" />
+            </label>
+            <label>
+              Investment goal
+              <select name="investmentGoal">
+                <option>long-term rental</option>
+                <option>flip</option>
+                <option>Airbnb</option>
+                <option>resale</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            Financing plan
+            <select name="financingType">
+              <option>hard money or DSCR loan</option>
+              <option>cash</option>
+              <option>conventional</option>
+              <option>private lender</option>
+            </select>
+          </label>
+          <label>
+            Spoken-style request
+            <textarea name="prompt">Analyze this auction property in Orlando: 6013 Fender Court. I have around $40,000 cash and want to know if I should bid and my maximum bid.</textarea>
+          </label>
+          <button class="primary" type="submit">Analyze auction</button>
+        </form>
+
+        <section class="results">
+          <div class="decision-card" id="decisionCard">
+            <p class="label">Recommendation</p>
+            <h2 id="recommendation">Waiting for analysis</h2>
+            <p id="summary">Enter the auction details and run the analysis.</p>
+            <div class="bid-row">
+              <div>
+                <span>Maximum Safe Bid</span>
+                <strong id="maxBid">-</strong>
+              </div>
+              <div>
+                <span>Do Not Bid Above</span>
+                <strong id="doNotBid">-</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="widgets">
+            <article class="widget">
+              <p class="label">Widget 1</p>
+              <h3>Buying Power</h3>
+              <p id="buyingPower">Run an analysis to calculate cash pressure.</p>
+            </article>
+            <article class="widget">
+              <p class="label">Widget 2</p>
+              <h3>Hidden Costs</h3>
+              <p id="hiddenCosts">Run an analysis to surface due diligence risk.</p>
+            </article>
+            <article class="widget">
+              <p class="label">Widget 3</p>
+              <h3>Rental Yield</h3>
+              <p id="rentalYield">Run an analysis to estimate investment return.</p>
+            </article>
+            <article class="widget">
+              <p class="label">Widget 4</p>
+              <h3>Personal Fit</h3>
+              <p id="personalFit">Run an analysis to compare the deal to your risk profile.</p>
+            </article>
+          </div>
+
+          <section class="checklist-panel">
+            <div class="section-heading">
+              <p class="label">Official research checklist</p>
+              <h3>What could go wrong?</h3>
+            </div>
+            <div id="checklist" class="checklist"></div>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
