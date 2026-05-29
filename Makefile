@@ -12,6 +12,9 @@ web:
 check-nebius:
 	python3 scripts/check_nebius.py
 
+list-nebius-models:
+	python3 scripts/check_nebius.py --list-models
+
 run-actions:
 	rasa run actions
 

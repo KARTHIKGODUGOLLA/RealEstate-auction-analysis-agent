@@ -30,8 +30,12 @@ analysis engine:
 
 ```bash
 cp .env.example .env
-# Fill NEBIUS_API_KEY and NEBIUS_MODEL_ID from Token Factory.
+# Fill NEBIUS_API_KEY from Token Factory.
+# Recommended command-generator model:
+# NEBIUS_MODEL_ID=Qwen/Qwen3-235B-A22B-Instruct-2507
 python3 -m pip install -e ".[rasa]"
+make list-nebius-models
+make check-nebius
 make train
 make run-actions
 make rasa
