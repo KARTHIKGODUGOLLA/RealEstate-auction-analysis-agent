@@ -1,0 +1,626 @@
+{
+  "OC-2026-1001": {
+    "parcel_id": "OC-2026-1001",
+    "annual_tax": 1012,
+    "unpaid_taxes": 18813,
+    "delinquent": true,
+    "tax_certificates": [
+      {
+        "year": 2024,
+        "certificate_number": "TC-2024-20735",
+        "amount": 5352,
+        "status": "Outstanding"
+      },
+      {
+        "year": 2023,
+        "certificate_number": "TC-2023-12540",
+        "amount": 5918,
+        "status": "Outstanding"
+      },
+      {
+        "year": 2022,
+        "certificate_number": "TC-2022-16826",
+        "amount": 4366,
+        "status": "Outstanding"
+      }
+    ],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 1012,
+        "status": "Paid late"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 1012,
+        "status": "Partial payment"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 1012,
+        "status": "Paid late"
+      }
+    ]
+  },
+  "OC-2026-1002": {
+    "parcel_id": "OC-2026-1002",
+    "annual_tax": 3166,
+    "unpaid_taxes": 0,
+    "delinquent": false,
+    "tax_certificates": [],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 3166,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 3166,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 3166,
+        "status": "Paid in full"
+      }
+    ]
+  },
+  "OC-2026-1003": {
+    "parcel_id": "OC-2026-1003",
+    "annual_tax": 1454,
+    "unpaid_taxes": 6016,
+    "delinquent": true,
+    "tax_certificates": [
+      {
+        "year": 2024,
+        "certificate_number": "TC-2024-36130",
+        "amount": 1666,
+        "status": "Outstanding"
+      },
+      {
+        "year": 2023,
+        "certificate_number": "TC-2023-91439",
+        "amount": 2748,
+        "status": "Outstanding"
+      }
+    ],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 1454,
+        "status": "Paid late"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 1454,
+        "status": "Paid late"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 1454,
+        "status": "Delinquent"
+      }
+    ]
+  },
+  "OC-2026-1004": {
+    "parcel_id": "OC-2026-1004",
+    "annual_tax": 3524,
+    "unpaid_taxes": 0,
+    "delinquent": false,
+    "tax_certificates": [],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 3524,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 3524,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 3524,
+        "status": "Paid in full"
+      }
+    ]
+  },
+  "OC-2026-1005": {
+    "parcel_id": "OC-2026-1005",
+    "annual_tax": 1528,
+    "unpaid_taxes": 1392,
+    "delinquent": true,
+    "tax_certificates": [
+      {
+        "year": 2024,
+        "certificate_number": "TC-2024-43586",
+        "amount": 1555,
+        "status": "Outstanding"
+      }
+    ],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 1528,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 1528,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 1528,
+        "status": "Paid in full"
+      }
+    ]
+  },
+  "OC-2026-1006": {
+    "parcel_id": "OC-2026-1006",
+    "annual_tax": 2060,
+    "unpaid_taxes": 942,
+    "delinquent": true,
+    "tax_certificates": [],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 2060,
+        "status": "Paid late"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 2060,
+        "status": "Paid late"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 2060,
+        "status": "Paid late"
+      }
+    ]
+  },
+  "OC-2026-1007": {
+    "parcel_id": "OC-2026-1007",
+    "annual_tax": 714,
+    "unpaid_taxes": 11498,
+    "delinquent": true,
+    "tax_certificates": [
+      {
+        "year": 2024,
+        "certificate_number": "TC-2024-87607",
+        "amount": 3489,
+        "status": "Outstanding"
+      },
+      {
+        "year": 2023,
+        "certificate_number": "TC-2023-23356",
+        "amount": 3970,
+        "status": "Outstanding"
+      }
+    ],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 714,
+        "status": "Partial payment"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 714,
+        "status": "Partial payment"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 714,
+        "status": "Paid late"
+      }
+    ]
+  },
+  "OC-2026-1008": {
+    "parcel_id": "OC-2026-1008",
+    "annual_tax": 1868,
+    "unpaid_taxes": 23544,
+    "delinquent": true,
+    "tax_certificates": [
+      {
+        "year": 2024,
+        "certificate_number": "TC-2024-55508",
+        "amount": 5864,
+        "status": "Outstanding"
+      },
+      {
+        "year": 2023,
+        "certificate_number": "TC-2023-66148",
+        "amount": 4535,
+        "status": "Outstanding"
+      }
+    ],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 1868,
+        "status": "Paid late"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 1868,
+        "status": "Partial payment"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 1868,
+        "status": "Partial payment"
+      }
+    ]
+  },
+  "OC-2026-1009": {
+    "parcel_id": "OC-2026-1009",
+    "annual_tax": 1332,
+    "unpaid_taxes": 2220,
+    "delinquent": true,
+    "tax_certificates": [
+      {
+        "year": 2024,
+        "certificate_number": "TC-2024-23833",
+        "amount": 1687,
+        "status": "Outstanding"
+      }
+    ],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 1332,
+        "status": "Paid late"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 1332,
+        "status": "Paid late"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 1332,
+        "status": "Paid in full"
+      }
+    ]
+  },
+  "OC-2026-1010": {
+    "parcel_id": "OC-2026-1010",
+    "annual_tax": 2031,
+    "unpaid_taxes": 2637,
+    "delinquent": true,
+    "tax_certificates": [
+      {
+        "year": 2024,
+        "certificate_number": "TC-2024-90728",
+        "amount": 1902,
+        "status": "Outstanding"
+      }
+    ],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 2031,
+        "status": "Paid late"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 2031,
+        "status": "Paid late"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 2031,
+        "status": "Paid late"
+      }
+    ]
+  },
+  "OC-2026-1011": {
+    "parcel_id": "OC-2026-1011",
+    "annual_tax": 1625,
+    "unpaid_taxes": 24414,
+    "delinquent": true,
+    "tax_certificates": [
+      {
+        "year": 2024,
+        "certificate_number": "TC-2024-52245",
+        "amount": 3511,
+        "status": "Outstanding"
+      },
+      {
+        "year": 2023,
+        "certificate_number": "TC-2023-21359",
+        "amount": 3784,
+        "status": "Outstanding"
+      },
+      {
+        "year": 2022,
+        "certificate_number": "TC-2022-69087",
+        "amount": 3497,
+        "status": "Outstanding"
+      }
+    ],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 1625,
+        "status": "Delinquent"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 1625,
+        "status": "Partial payment"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 1625,
+        "status": "Partial payment"
+      }
+    ]
+  },
+  "OC-2026-1012": {
+    "parcel_id": "OC-2026-1012",
+    "annual_tax": 1849,
+    "unpaid_taxes": 1877,
+    "delinquent": true,
+    "tax_certificates": [],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 1849,
+        "status": "Paid late"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 1849,
+        "status": "Paid late"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 1849,
+        "status": "Paid in full"
+      }
+    ]
+  },
+  "OC-2026-1013": {
+    "parcel_id": "OC-2026-1013",
+    "annual_tax": 2951,
+    "unpaid_taxes": 0,
+    "delinquent": false,
+    "tax_certificates": [],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 2951,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 2951,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 2951,
+        "status": "Paid in full"
+      }
+    ]
+  },
+  "OC-2026-1014": {
+    "parcel_id": "OC-2026-1014",
+    "annual_tax": 2183,
+    "unpaid_taxes": 1558,
+    "delinquent": true,
+    "tax_certificates": [
+      {
+        "year": 2024,
+        "certificate_number": "TC-2024-46655",
+        "amount": 2020,
+        "status": "Outstanding"
+      }
+    ],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 2183,
+        "status": "Paid late"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 2183,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 2183,
+        "status": "Paid in full"
+      }
+    ]
+  },
+  "OC-2026-1015": {
+    "parcel_id": "OC-2026-1015",
+    "annual_tax": 1717,
+    "unpaid_taxes": 0,
+    "delinquent": false,
+    "tax_certificates": [],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 1717,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 1717,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 1717,
+        "status": "Paid in full"
+      }
+    ]
+  },
+  "OC-2026-1016": {
+    "parcel_id": "OC-2026-1016",
+    "annual_tax": 1732,
+    "unpaid_taxes": 21009,
+    "delinquent": true,
+    "tax_certificates": [
+      {
+        "year": 2024,
+        "certificate_number": "TC-2024-41499",
+        "amount": 5400,
+        "status": "Outstanding"
+      },
+      {
+        "year": 2023,
+        "certificate_number": "TC-2023-94659",
+        "amount": 5520,
+        "status": "Outstanding"
+      },
+      {
+        "year": 2022,
+        "certificate_number": "TC-2022-68743",
+        "amount": 1641,
+        "status": "Outstanding"
+      },
+      {
+        "year": 2021,
+        "certificate_number": "TC-2021-22196",
+        "amount": 3910,
+        "status": "Outstanding"
+      }
+    ],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 1732,
+        "status": "Paid late"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 1732,
+        "status": "Delinquent"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 1732,
+        "status": "Partial payment"
+      }
+    ]
+  },
+  "OC-2026-1017": {
+    "parcel_id": "OC-2026-1017",
+    "annual_tax": 1270,
+    "unpaid_taxes": 2882,
+    "delinquent": true,
+    "tax_certificates": [
+      {
+        "year": 2024,
+        "certificate_number": "TC-2024-72031",
+        "amount": 1933,
+        "status": "Outstanding"
+      }
+    ],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 1270,
+        "status": "Paid late"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 1270,
+        "status": "Paid late"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 1270,
+        "status": "Paid late"
+      }
+    ]
+  },
+  "OC-2026-1018": {
+    "parcel_id": "OC-2026-1018",
+    "annual_tax": 1724,
+    "unpaid_taxes": 2358,
+    "delinquent": true,
+    "tax_certificates": [
+      {
+        "year": 2024,
+        "certificate_number": "TC-2024-50189",
+        "amount": 1314,
+        "status": "Outstanding"
+      }
+    ],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 1724,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 1724,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 1724,
+        "status": "Paid in full"
+      }
+    ]
+  },
+  "OC-2026-1019": {
+    "parcel_id": "OC-2026-1019",
+    "annual_tax": 2366,
+    "unpaid_taxes": 0,
+    "delinquent": false,
+    "tax_certificates": [],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 2366,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 2366,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 2366,
+        "status": "Paid in full"
+      }
+    ]
+  },
+  "OC-2026-1020": {
+    "parcel_id": "OC-2026-1020",
+    "annual_tax": 2221,
+    "unpaid_taxes": 0,
+    "delinquent": false,
+    "tax_certificates": [],
+    "payment_history": [
+      {
+        "year": 2023,
+        "amount_billed": 2221,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2022,
+        "amount_billed": 2221,
+        "status": "Paid in full"
+      },
+      {
+        "year": 2021,
+        "amount_billed": 2221,
+        "status": "Paid in full"
+      }
+    ]
+  }
+}

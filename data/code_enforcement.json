@@ -1,0 +1,468 @@
+{
+  "4257 holden ave, orlando, fl 32839": {
+    "address": "4257 Holden Ave, Orlando, FL 32839",
+    "open_violations": [
+      {
+        "case_number": "CE-2022-71537",
+        "opened_date": "2023-06-20",
+        "violation_type": "Inoperable vehicle",
+        "description": "Inoperable/unregistered vehicle stored on property",
+        "fine_amount": 2064,
+        "status": "Lien filed"
+      },
+      {
+        "case_number": "CE-2023-98389",
+        "opened_date": "2024-07-11",
+        "violation_type": "Inoperable vehicle",
+        "description": "Inoperable/unregistered vehicle stored on property",
+        "fine_amount": 1457,
+        "status": "Lien filed"
+      },
+      {
+        "case_number": "CE-2024-18968",
+        "opened_date": "2022-11-22",
+        "violation_type": "Pool maintenance",
+        "description": "Stagnant pool water; mosquito hazard",
+        "fine_amount": 1094,
+        "status": "Unresolved"
+      }
+    ],
+    "unsafe_structure": false,
+    "open_fines_total": 4615,
+    "compliance_deadline": "2026-06-30"
+  },
+  "2584 mills ave, orlando, fl 32803": {
+    "address": "2584 Mills Ave, Orlando, FL 32803",
+    "open_violations": [],
+    "unsafe_structure": false,
+    "open_fines_total": 0,
+    "compliance_deadline": null
+  },
+  "4733 pine hills rd, orlando, fl 32808": {
+    "address": "4733 Pine Hills Rd, Orlando, FL 32808",
+    "open_violations": [
+      {
+        "case_number": "CE-2022-93066",
+        "opened_date": "2024-02-15",
+        "violation_type": "Unsafe structure",
+        "description": "Building declared unsafe per FBC Existing Building Ch.1",
+        "fine_amount": 4355,
+        "status": "Open"
+      },
+      {
+        "case_number": "CE-2022-52516",
+        "opened_date": "2022-05-12",
+        "violation_type": "Garbage accumulation",
+        "description": "Solid waste and debris on property",
+        "fine_amount": 1037,
+        "status": "Unresolved"
+      },
+      {
+        "case_number": "CE-2022-79621",
+        "opened_date": "2023-10-22",
+        "violation_type": "Inoperable vehicle",
+        "description": "Inoperable/unregistered vehicle stored on property",
+        "fine_amount": 1992,
+        "status": "Open"
+      },
+      {
+        "case_number": "CE-2022-89887",
+        "opened_date": "2023-10-22",
+        "violation_type": "Abandoned property",
+        "description": "Property appears abandoned; secure and maintain required",
+        "fine_amount": 2234,
+        "status": "Open"
+      },
+      {
+        "case_number": "CE-2022-70443",
+        "opened_date": "2024-05-15",
+        "violation_type": "Pool maintenance",
+        "description": "Stagnant pool water; mosquito hazard",
+        "fine_amount": 1972,
+        "status": "Unresolved"
+      }
+    ],
+    "unsafe_structure": true,
+    "open_fines_total": 11590,
+    "compliance_deadline": "2026-06-30"
+  },
+  "3803 silver star rd, orlando, fl 32818": {
+    "address": "3803 Silver Star Rd, Orlando, FL 32818",
+    "open_violations": [],
+    "unsafe_structure": false,
+    "open_fines_total": 0,
+    "compliance_deadline": null
+  },
+  "6155 rio grande ave, orlando, fl 32805": {
+    "address": "6155 Rio Grande Ave, Orlando, FL 32805",
+    "open_violations": [
+      {
+        "case_number": "CE-2024-98815",
+        "opened_date": "2024-09-06",
+        "violation_type": "Permit expired",
+        "description": "Open building permit past expiration with no inspections",
+        "fine_amount": 789,
+        "status": "Open"
+      }
+    ],
+    "unsafe_structure": false,
+    "open_fines_total": 789,
+    "compliance_deadline": "2026-07-15"
+  },
+  "9348 old cheney hwy, orlando, fl 32825": {
+    "address": "9348 Old Cheney Hwy, Orlando, FL 32825",
+    "open_violations": [
+      {
+        "case_number": "CE-2024-49210",
+        "opened_date": "2024-11-14",
+        "violation_type": "Permit expired",
+        "description": "Open building permit past expiration with no inspections",
+        "fine_amount": 1403,
+        "status": "In compliance period"
+      },
+      {
+        "case_number": "CE-2024-36111",
+        "opened_date": "2024-07-28",
+        "violation_type": "Permit expired",
+        "description": "Open building permit past expiration with no inspections",
+        "fine_amount": 818,
+        "status": "In compliance period"
+      }
+    ],
+    "unsafe_structure": false,
+    "open_fines_total": 2221,
+    "compliance_deadline": "2026-07-15"
+  },
+  "9797 hiawassee rd, orlando, fl 32811": {
+    "address": "9797 Hiawassee Rd, Orlando, FL 32811",
+    "open_violations": [
+      {
+        "case_number": "CE-2024-57049",
+        "opened_date": "2024-05-23",
+        "violation_type": "Permit expired",
+        "description": "Open building permit past expiration with no inspections",
+        "fine_amount": 3924,
+        "status": "Unresolved"
+      },
+      {
+        "case_number": "CE-2023-11061",
+        "opened_date": "2024-11-25",
+        "violation_type": "Overgrown lot",
+        "description": "Grass and vegetation exceeding 12 inches",
+        "fine_amount": 4042,
+        "status": "Lien filed"
+      },
+      {
+        "case_number": "CE-2023-40162",
+        "opened_date": "2024-06-08",
+        "violation_type": "Overgrown lot",
+        "description": "Grass and vegetation exceeding 12 inches",
+        "fine_amount": 4869,
+        "status": "Lien filed"
+      },
+      {
+        "case_number": "CE-2023-98835",
+        "opened_date": "2023-09-10",
+        "violation_type": "Unsafe structure",
+        "description": "Building declared unsafe per FBC Existing Building Ch.1",
+        "fine_amount": 3026,
+        "status": "Open"
+      }
+    ],
+    "unsafe_structure": true,
+    "open_fines_total": 15861,
+    "compliance_deadline": "2026-06-30"
+  },
+  "9317 mercer pl, orlando, fl 32803": {
+    "address": "9317 Mercer Pl, Orlando, FL 32803",
+    "open_violations": [
+      {
+        "case_number": "CE-2024-94717",
+        "opened_date": "2022-05-26",
+        "violation_type": "Abandoned property",
+        "description": "Property appears abandoned; secure and maintain required",
+        "fine_amount": 1595,
+        "status": "Unresolved"
+      },
+      {
+        "case_number": "CE-2024-27224",
+        "opened_date": "2022-05-11",
+        "violation_type": "Overgrown lot",
+        "description": "Grass and vegetation exceeding 12 inches",
+        "fine_amount": 3788,
+        "status": "Lien filed"
+      },
+      {
+        "case_number": "CE-2022-27322",
+        "opened_date": "2024-06-17",
+        "violation_type": "Inoperable vehicle",
+        "description": "Inoperable/unregistered vehicle stored on property",
+        "fine_amount": 2238,
+        "status": "Lien filed"
+      },
+      {
+        "case_number": "CE-2023-73156",
+        "opened_date": "2023-12-28",
+        "violation_type": "Garbage accumulation",
+        "description": "Solid waste and debris on property",
+        "fine_amount": 2147,
+        "status": "Unresolved"
+      },
+      {
+        "case_number": "CE-2022-28449",
+        "opened_date": "2022-11-24",
+        "violation_type": "Unsafe structure",
+        "description": "Building declared unsafe per FBC Existing Building Ch.1",
+        "fine_amount": 4636,
+        "status": "Lien filed"
+      }
+    ],
+    "unsafe_structure": true,
+    "open_fines_total": 14404,
+    "compliance_deadline": "2026-06-30"
+  },
+  "2290 rio grande ave, orlando, fl 32805": {
+    "address": "2290 Rio Grande Ave, Orlando, FL 32805",
+    "open_violations": [
+      {
+        "case_number": "CE-2024-21836",
+        "opened_date": "2024-07-01",
+        "violation_type": "Garbage accumulation",
+        "description": "Solid waste and debris on property",
+        "fine_amount": 949,
+        "status": "In compliance period"
+      },
+      {
+        "case_number": "CE-2024-69609",
+        "opened_date": "2024-06-22",
+        "violation_type": "Garbage accumulation",
+        "description": "Solid waste and debris on property",
+        "fine_amount": 453,
+        "status": "In compliance period"
+      }
+    ],
+    "unsafe_structure": false,
+    "open_fines_total": 1402,
+    "compliance_deadline": "2026-07-15"
+  },
+  "7118 mills ave, orlando, fl 32803": {
+    "address": "7118 Mills Ave, Orlando, FL 32803",
+    "open_violations": [
+      {
+        "case_number": "CE-2024-24201",
+        "opened_date": "2024-11-08",
+        "violation_type": "Garbage accumulation",
+        "description": "Solid waste and debris on property",
+        "fine_amount": 960,
+        "status": "In compliance period"
+      },
+      {
+        "case_number": "CE-2024-83584",
+        "opened_date": "2024-06-20",
+        "violation_type": "Overgrown lot",
+        "description": "Grass and vegetation exceeding 12 inches",
+        "fine_amount": 1468,
+        "status": "Open"
+      }
+    ],
+    "unsafe_structure": false,
+    "open_fines_total": 2428,
+    "compliance_deadline": "2026-07-15"
+  },
+  "6413 pine hills rd, orlando, fl 32808": {
+    "address": "6413 Pine Hills Rd, Orlando, FL 32808",
+    "open_violations": [
+      {
+        "case_number": "CE-2024-49608",
+        "opened_date": "2024-07-04",
+        "violation_type": "Unsafe structure",
+        "description": "Building declared unsafe per FBC Existing Building Ch.1",
+        "fine_amount": 4603,
+        "status": "Open"
+      },
+      {
+        "case_number": "CE-2023-74569",
+        "opened_date": "2022-02-08",
+        "violation_type": "Overgrown lot",
+        "description": "Grass and vegetation exceeding 12 inches",
+        "fine_amount": 1104,
+        "status": "Lien filed"
+      },
+      {
+        "case_number": "CE-2023-58629",
+        "opened_date": "2024-12-23",
+        "violation_type": "Abandoned property",
+        "description": "Property appears abandoned; secure and maintain required",
+        "fine_amount": 3983,
+        "status": "Lien filed"
+      },
+      {
+        "case_number": "CE-2023-95841",
+        "opened_date": "2022-08-20",
+        "violation_type": "Inoperable vehicle",
+        "description": "Inoperable/unregistered vehicle stored on property",
+        "fine_amount": 2065,
+        "status": "Unresolved"
+      },
+      {
+        "case_number": "CE-2024-58566",
+        "opened_date": "2022-08-15",
+        "violation_type": "Garbage accumulation",
+        "description": "Solid waste and debris on property",
+        "fine_amount": 1068,
+        "status": "Open"
+      }
+    ],
+    "unsafe_structure": true,
+    "open_fines_total": 12823,
+    "compliance_deadline": "2026-06-30"
+  },
+  "6804 orange blossom trl, orlando, fl 32839": {
+    "address": "6804 Orange Blossom Trl, Orlando, FL 32839",
+    "open_violations": [
+      {
+        "case_number": "CE-2024-81364",
+        "opened_date": "2024-11-12",
+        "violation_type": "Overgrown lot",
+        "description": "Grass and vegetation exceeding 12 inches",
+        "fine_amount": 952,
+        "status": "Open"
+      },
+      {
+        "case_number": "CE-2024-34878",
+        "opened_date": "2024-02-28",
+        "violation_type": "Permit expired",
+        "description": "Open building permit past expiration with no inspections",
+        "fine_amount": 765,
+        "status": "In compliance period"
+      }
+    ],
+    "unsafe_structure": false,
+    "open_fines_total": 1717,
+    "compliance_deadline": "2026-07-15"
+  },
+  "5563 lake underhill rd, orlando, fl 32825": {
+    "address": "5563 Lake Underhill Rd, Orlando, FL 32825",
+    "open_violations": [],
+    "unsafe_structure": false,
+    "open_fines_total": 0,
+    "compliance_deadline": null
+  },
+  "7570 curry ford rd, orlando, fl 32822": {
+    "address": "7570 Curry Ford Rd, Orlando, FL 32822",
+    "open_violations": [
+      {
+        "case_number": "CE-2024-94109",
+        "opened_date": "2024-11-20",
+        "violation_type": "Garbage accumulation",
+        "description": "Solid waste and debris on property",
+        "fine_amount": 634,
+        "status": "Open"
+      }
+    ],
+    "unsafe_structure": false,
+    "open_fines_total": 634,
+    "compliance_deadline": "2026-07-15"
+  },
+  "9883 rio grande ave, orlando, fl 32805": {
+    "address": "9883 Rio Grande Ave, Orlando, FL 32805",
+    "open_violations": [],
+    "unsafe_structure": false,
+    "open_fines_total": 0,
+    "compliance_deadline": null
+  },
+  "7615 conway rd, orlando, fl 32812": {
+    "address": "7615 Conway Rd, Orlando, FL 32812",
+    "open_violations": [
+      {
+        "case_number": "CE-2022-84000",
+        "opened_date": "2022-02-27",
+        "violation_type": "Illegal addition",
+        "description": "Structure added without permit",
+        "fine_amount": 2795,
+        "status": "Lien filed"
+      },
+      {
+        "case_number": "CE-2022-53064",
+        "opened_date": "2022-10-01",
+        "violation_type": "Permit expired",
+        "description": "Open building permit past expiration with no inspections",
+        "fine_amount": 2569,
+        "status": "Unresolved"
+      },
+      {
+        "case_number": "CE-2024-42853",
+        "opened_date": "2022-02-22",
+        "violation_type": "Abandoned property",
+        "description": "Property appears abandoned; secure and maintain required",
+        "fine_amount": 1864,
+        "status": "Open"
+      },
+      {
+        "case_number": "CE-2023-41186",
+        "opened_date": "2023-09-10",
+        "violation_type": "Unsafe structure",
+        "description": "Building declared unsafe per FBC Existing Building Ch.1",
+        "fine_amount": 3467,
+        "status": "Open"
+      }
+    ],
+    "unsafe_structure": true,
+    "open_fines_total": 10695,
+    "compliance_deadline": "2026-06-30"
+  },
+  "8491 mercer pl, orlando, fl 32803": {
+    "address": "8491 Mercer Pl, Orlando, FL 32803",
+    "open_violations": [
+      {
+        "case_number": "CE-2024-44782",
+        "opened_date": "2024-01-05",
+        "violation_type": "Overgrown lot",
+        "description": "Grass and vegetation exceeding 12 inches",
+        "fine_amount": 556,
+        "status": "In compliance period"
+      },
+      {
+        "case_number": "CE-2024-18330",
+        "opened_date": "2024-08-15",
+        "violation_type": "Garbage accumulation",
+        "description": "Solid waste and debris on property",
+        "fine_amount": 432,
+        "status": "In compliance period"
+      }
+    ],
+    "unsafe_structure": false,
+    "open_fines_total": 988,
+    "compliance_deadline": "2026-07-15"
+  },
+  "5669 edgewater dr, orlando, fl 32804": {
+    "address": "5669 Edgewater Dr, Orlando, FL 32804",
+    "open_violations": [
+      {
+        "case_number": "CE-2024-39038",
+        "opened_date": "2024-10-02",
+        "violation_type": "Permit expired",
+        "description": "Open building permit past expiration with no inspections",
+        "fine_amount": 1231,
+        "status": "In compliance period"
+      }
+    ],
+    "unsafe_structure": false,
+    "open_fines_total": 1231,
+    "compliance_deadline": "2026-07-15"
+  },
+  "5462 old cheney hwy, orlando, fl 32825": {
+    "address": "5462 Old Cheney Hwy, Orlando, FL 32825",
+    "open_violations": [],
+    "unsafe_structure": false,
+    "open_fines_total": 0,
+    "compliance_deadline": null
+  },
+  "5291 old cheney hwy, orlando, fl 32825": {
+    "address": "5291 Old Cheney Hwy, Orlando, FL 32825",
+    "open_violations": [],
+    "unsafe_structure": false,
+    "open_fines_total": 0,
+    "compliance_deadline": null
+  }
+}
