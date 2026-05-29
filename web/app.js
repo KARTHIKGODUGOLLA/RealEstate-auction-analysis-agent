@@ -1,8 +1,10 @@
 const form = document.querySelector("#analysisForm");
 const decisionCard = document.querySelector("#decisionCard");
 const voiceButton = document.querySelector("#voiceButton");
+const voiceReplyToggle = document.querySelector("#voiceReplyToggle");
 const voiceStatus = document.querySelector("#voiceStatus");
 const propertySelect = document.querySelector("#propertySelect");
+const propertySummary = document.querySelector("#propertySummary");
 const rasaTranscript = document.querySelector("#rasaTranscript");
 const rasaMessage = document.querySelector("#rasaMessage");
 const rasaSend = document.querySelector("#rasaSend");
@@ -16,9 +18,20 @@ const currency = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
+let voiceRepliesEnabled = "speechSynthesis" in window;
+
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  await analyze();
+  await analyze({ speakResult: true });
+});
+
+voiceReplyToggle.addEventListener("click", () => {
+  voiceRepliesEnabled = !voiceRepliesEnabled;
+  if (!voiceRepliesEnabled) {
+    window.speechSynthesis?.cancel();
+  }
+  voiceReplyToggle.textContent = voiceRepliesEnabled ? "Voice replies on" : "Voice replies off";
+  voiceReplyToggle.setAttribute("aria-pressed", String(voiceRepliesEnabled));
 });
 
 rasaSend.addEventListener("click", async () => {
@@ -52,6 +65,7 @@ propertySelect.addEventListener("change", () => {
   form.elements.currentBid.value = selected.dataset.currentBid || selected.dataset.minimumBid;
   form.elements.estimatedRepairs.value = "";
   form.elements.marketRent.value = "";
+  renderPropertySummary(selected);
   analyze();
 });
 
@@ -70,8 +84,9 @@ voiceButton.addEventListener("click", () => {
   };
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
-    form.elements.prompt.value = transcript;
+    rasaMessage.value = transcript;
     voiceStatus.textContent = `Heard: "${transcript}"`;
+    sendRasaMessage(transcript);
   };
   recognition.onerror = () => {
     voiceStatus.textContent = "Voice input had trouble hearing that. Text fallback is ready.";
@@ -79,7 +94,8 @@ voiceButton.addEventListener("click", () => {
   recognition.start();
 });
 
-async function analyze() {
+async function analyze(options = {}) {
+  const { speakResult = false } = options;
   setLoading(true);
   const payload = Object.fromEntries(new FormData(form).entries());
   const response = await fetch("/api/analyze", {
@@ -89,6 +105,9 @@ async function analyze() {
   });
   const analysis = await response.json();
   render(analysis);
+  if (speakResult) {
+    speakRecommendation(analysis);
+  }
   setLoading(false);
 }
 
@@ -115,7 +134,11 @@ async function sendRasaMessage(quickMessage = null) {
       appendMessage("agent", "Rasa returned no messages. It may be waiting for another turn.");
       return;
     }
-    payload.forEach((item) => appendMessage("agent", item.text || JSON.stringify(item)));
+    payload.forEach((item) => {
+      const text = item.text || JSON.stringify(item);
+      appendMessage("agent", text);
+      speak(text);
+    });
   } catch (error) {
     appendMessage("error", `Could not reach the local Rasa proxy: ${error.message}`);
   } finally {
@@ -158,6 +181,40 @@ function appendMessage(kind, text) {
   rasaTranscript.scrollTop = rasaTranscript.scrollHeight;
 }
 
+function speakRecommendation(analysis) {
+  const rec = analysis.recommendation;
+  const hidden = analysis.hidden_costs;
+  const text = [
+    `${rec.category}.`,
+    rec.summary,
+    `The biggest risk is ${rec.biggest_risk}.`,
+    hidden.summary,
+  ].join(" ");
+  speak(text);
+}
+
+function speak(text) {
+  if (!voiceRepliesEnabled || !("speechSynthesis" in window)) return;
+  const cleanText = text
+    .replace(/\s+/g, " ")
+    .replace(/\$([0-9,]+)/g, "$1 dollars")
+    .slice(0, 900);
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(cleanText);
+  utterance.rate = 0.96;
+  utterance.pitch = 1;
+  utterance.onstart = () => {
+    voiceStatus.textContent = "Speaking response...";
+  };
+  utterance.onend = () => {
+    voiceStatus.textContent = "Ready for the next question.";
+  };
+  utterance.onerror = () => {
+    voiceStatus.textContent = "Voice reply had trouble. The text response is still available.";
+  };
+  window.speechSynthesis.speak(utterance);
+}
+
 async function loadProperties() {
   const response = await fetch("/api/properties");
   const payload = await response.json();
@@ -168,8 +225,28 @@ async function loadProperties() {
     option.dataset.address = property.address;
     option.dataset.currentBid = property.current_bid || "";
     option.dataset.minimumBid = property.minimum_bid || "";
+    option.dataset.auctionDate = property.auction_date || "";
+    option.dataset.deposit = property.deposit_required || "";
     propertySelect.appendChild(option);
   });
+  renderPropertySummary(propertySelect.selectedOptions[0]);
+}
+
+function renderPropertySummary(selected) {
+  if (!selected) return;
+  const address = selected.dataset.address || "6013 Fender Court";
+  const bid = selected.dataset.currentBid || selected.dataset.minimumBid || form.elements.currentBid.value;
+  const deposit = selected.dataset.deposit;
+  const auctionDate = selected.dataset.auctionDate;
+  propertySummary.innerHTML = `
+    <span>Selected deal</span>
+    <strong>${address}</strong>
+    <small>${[
+      bid ? `Bid ${currency.format(Number(bid))}` : null,
+      deposit ? `Deposit ${currency.format(Number(deposit))}` : null,
+      auctionDate ? `Auction ${auctionDate}` : null,
+    ].filter(Boolean).join(" · ") || "Official auction facts and diligence assumptions loaded."}</small>
+  `;
 }
 
 function render(analysis) {
@@ -244,7 +321,7 @@ function percent(value) {
 function setLoading(isLoading) {
   const button = form.querySelector("button[type='submit']");
   button.disabled = isLoading;
-  button.textContent = isLoading ? "Analyzing..." : "Analyze auction";
+  button.textContent = isLoading ? "Analyzing..." : "Analyze selected property";
 }
 
 analyze();

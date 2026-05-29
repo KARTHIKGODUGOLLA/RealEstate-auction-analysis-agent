@@ -19,47 +19,37 @@
             <span class="mic-dot"></span>
             <span>Ask by voice</span>
           </button>
-          <p id="voiceStatus">Voice input uses your browser when available. Text works as backup.</p>
+          <button id="voiceReplyToggle" class="voice-reply-toggle" type="button" aria-pressed="true">
+            Voice replies on
+          </button>
+          <p id="voiceStatus">Ask out loud. The advisor will answer in chat and read the response back.</p>
         </div>
       </section>
 
       <section class="workspace">
         <form id="analysisForm" class="input-panel">
           <label>
-            Demo property
+            Auction property
             <select name="parcelId" id="propertySelect">
               <option value="">6013 Fender Court live Treasury page</option>
             </select>
           </label>
+
+          <div id="propertySummary" class="property-summary">
+            <span>Selected deal</span>
+            <strong>6013 Fender Court</strong>
+            <small>Official auction facts and diligence assumptions will be loaded for this property.</small>
+          </div>
+
+          <input name="address" type="hidden" value="6013 Fender Court" />
+          <input name="city" type="hidden" value="Orlando" />
+
           <label>
-            Property address
-            <input name="address" value="6013 Fender Court" />
+            Available cash
+            <input name="availableCash" type="number" value="40000" />
           </label>
+
           <div class="grid-2">
-            <label>
-              City
-              <input name="city" value="Orlando" />
-            </label>
-            <label>
-              Current bid
-              <input name="currentBid" type="number" value="170000" />
-            </label>
-          </div>
-          <div class="grid-2">
-            <label>
-              Available cash
-              <input name="availableCash" type="number" value="40000" />
-            </label>
-            <label>
-              Repairs estimate
-              <input name="estimatedRepairs" type="number" value="5000" />
-            </label>
-          </div>
-          <div class="grid-2">
-            <label>
-              Market rent
-              <input name="marketRent" type="number" value="2200" />
-            </label>
             <label>
               Investment goal
               <select name="investmentGoal">
@@ -79,11 +69,26 @@
               <option>private lender</option>
             </select>
           </label>
-          <label>
-            Spoken-style request
-            <textarea name="prompt">Analyze this auction property in Orlando: 6013 Fender Court. I have around $40,000 cash and want to know if I should bid and my maximum bid.</textarea>
-          </label>
-          <button class="primary" type="submit">Analyze auction</button>
+
+          <details class="advanced-assumptions">
+            <summary>Advanced assumptions</summary>
+            <div class="grid-2">
+              <label>
+                Current bid override
+                <input name="currentBid" type="number" value="170000" />
+              </label>
+              <label>
+                Repairs override
+                <input name="estimatedRepairs" type="number" />
+              </label>
+            </div>
+            <label>
+              Market rent override
+              <input name="marketRent" type="number" />
+            </label>
+          </details>
+
+          <button class="primary" type="submit">Analyze selected property</button>
         </form>
 
         <section class="results">
