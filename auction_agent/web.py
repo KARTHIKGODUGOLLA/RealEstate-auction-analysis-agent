@@ -11,6 +11,7 @@ from typing import Any
 from auction_agent.engine import analyze_auction
 from auction_agent.memory import save_analysis, update_buyer_profile
 from auction_agent.official_data import OFFICIAL_SOURCE_DIRECTORY
+from auction_agent.prepared_data import list_prepared_properties
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC_DIR = ROOT / "web"
@@ -20,6 +21,14 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         if self.path == "/api/sources":
             body = json.dumps({"sources": OFFICIAL_SOURCE_DIRECTORY}).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        if self.path == "/api/properties":
+            body = json.dumps({"properties": list_prepared_properties()}).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", str(len(body)))
@@ -58,7 +67,7 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
         }
 
         analysis = analyze_auction(
-            property_id="6013-fender-court",
+            property_id=payload.get("parcelId") or "6013-fender-court",
             property_overrides=property_overrides,
             profile_overrides=profile_overrides,
         )

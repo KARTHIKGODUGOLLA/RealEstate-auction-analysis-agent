@@ -2,6 +2,7 @@ const form = document.querySelector("#analysisForm");
 const decisionCard = document.querySelector("#decisionCard");
 const voiceButton = document.querySelector("#voiceButton");
 const voiceStatus = document.querySelector("#voiceStatus");
+const propertySelect = document.querySelector("#propertySelect");
 
 const currency = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -12,6 +13,17 @@ const currency = new Intl.NumberFormat("en-US", {
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   await analyze();
+});
+
+propertySelect.addEventListener("change", () => {
+  const selected = propertySelect.selectedOptions[0];
+  if (!selected?.dataset.address) return;
+  form.elements.address.value = selected.dataset.address.split(",")[0];
+  form.elements.city.value = "Orlando";
+  form.elements.currentBid.value = selected.dataset.currentBid || selected.dataset.minimumBid;
+  form.elements.estimatedRepairs.value = "";
+  form.elements.marketRent.value = "";
+  analyze();
 });
 
 voiceButton.addEventListener("click", () => {
@@ -51,6 +63,20 @@ async function analyze() {
   setLoading(false);
 }
 
+async function loadProperties() {
+  const response = await fetch("/api/properties");
+  const payload = await response.json();
+  payload.properties.forEach((property) => {
+    const option = document.createElement("option");
+    option.value = property.parcel_id;
+    option.textContent = `${property.parcel_id} · ${property.address}`;
+    option.dataset.address = property.address;
+    option.dataset.currentBid = property.current_bid || "";
+    option.dataset.minimumBid = property.minimum_bid || "";
+    propertySelect.appendChild(option);
+  });
+}
+
 function render(analysis) {
   const rec = analysis.recommendation;
   const buying = analysis.buying_power;
@@ -64,9 +90,12 @@ function render(analysis) {
   if (rec.category.toLowerCase().includes("green")) decisionCard.classList.add("green");
 
   document.querySelector("#recommendation").textContent = `${rec.category} · score ${rec.score}/100`;
-  document.querySelector("#officialStatus").textContent = official?.status === "verified"
-    ? "Official Treasury data verified live"
-    : "Using official-source fallback data";
+  document.querySelector("#officialStatus").textContent =
+    official?.status === "verified"
+      ? "Official Treasury data verified live"
+      : official?.status === "prepared_dataset"
+        ? "Prepared multi-source auction dataset loaded"
+        : "Using official-source fallback data";
   document.querySelector("#summary").textContent = rec.summary;
   document.querySelector("#maxBid").textContent = currency.format(rec.max_safe_bid);
   document.querySelector("#doNotBid").textContent = currency.format(rec.do_not_bid_above);
@@ -125,3 +154,4 @@ function setLoading(isLoading) {
 
 analyze();
 loadSources();
+loadProperties();

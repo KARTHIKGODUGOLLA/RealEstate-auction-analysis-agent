@@ -47,6 +47,8 @@ same four-widget recommendation used by the UI.
 - Personalized Recommendation: Green / Yellow / Red with max bid guidance.
 - Web UI: editable deal assumptions, browser voice input, four-widget cockpit.
 - Rasa flow/action: structured intake, deterministic analysis, persistent memory.
+- Prepared data adapter: supports the merged 20-property multi-source dataset by
+  `parcel_id` without exposing `scenario_key.json`.
 
 ## Demo Prompt
 

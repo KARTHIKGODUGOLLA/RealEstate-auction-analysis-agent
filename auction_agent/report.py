@@ -67,6 +67,8 @@ def _official_status_line(prop: dict) -> str:
     status = prop.get("official_data_status")
     if not status:
         return "Official data: seeded fallback."
+    if status.get("status") == "prepared_dataset":
+        return f"Official data: prepared multi-source dataset ({status.get('url')})."
     if status.get("status") == "verified":
         return f"Official data: verified from Treasury page ({status.get('url')})."
     return f"Official data: unavailable live; using fallback. Reason: {status.get('error', 'unknown')}"

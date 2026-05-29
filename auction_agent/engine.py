@@ -9,6 +9,7 @@ from typing import Any
 
 from auction_agent.data import BUYER_PROFILE, PROPERTIES
 from auction_agent.official_data import apply_official_overrides
+from auction_agent.prepared_data import load_prepared_property
 from auction_agent.widgets import (
     BuyingPowerResult,
     HiddenCostsResult,
@@ -38,7 +39,13 @@ def analyze_auction(
     use_official_data: bool = True,
 ) -> AuctionAnalysis:
     """Run the full analysis for a seeded property id."""
-    property_data = deepcopy(PROPERTIES[property_id])
+    property_data = load_prepared_property(property_id)
+    if property_data is None and property_overrides:
+        property_data = load_prepared_property(str(property_overrides.get("address") or ""))
+    if property_data is None:
+        property_data = deepcopy(PROPERTIES[property_id])
+    else:
+        use_official_data = False
     profile = deepcopy(BUYER_PROFILE)
     if use_official_data:
         property_data = apply_official_overrides(property_data)
