@@ -29,6 +29,8 @@ This repo now includes a Rasa CALM flow and custom action wrapper around the
 analysis engine:
 
 ```bash
+cp .env.example .env
+# Fill NEBIUS_API_KEY and NEBIUS_MODEL_ID from Token Factory.
 python3 -m pip install -e ".[rasa]"
 make train
 make run-actions
