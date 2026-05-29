@@ -1,0 +1,9 @@
+{
+  "deposit_rules": "Deposit must be paid within 24 hours of winning bid via wire transfer to designated escrow account. Personal checks not accepted.",
+  "financing": "No financing contingencies permitted. Buyer is responsible for arranging financing prior to bidding. Cash, hard money, DSCR, or pre-approved conventional financing only.",
+  "as_is_clause": "Property is sold AS-IS, WHERE-IS, with all faults and defects, latent or patent. Seller makes no representations or warranties whatsoever.",
+  "title_warning": "Buyer is responsible for verifying clear and marketable title. Certain liens, encumbrances, and assessments may survive the sale. Title insurance strongly recommended. Some municipal liens, code enforcement liens, and HOA assessments may transfer with property.",
+  "default_penalty": "Failure to close within the specified deadline results in immediate forfeiture of deposit, possible additional damages, and bar from future Treasury/CWS auctions for 24 months.",
+  "closing": "Closing must occur within 30-60 days of auction date depending on property type. Specific deadline stated in individual property terms. No extensions granted absent extraordinary circumstances.",
+  "inspection": "Inspection available by appointment only during designated open house periods. No inspection contingencies permitted. Buyer waives all inspection rights upon submitting bid."
+}

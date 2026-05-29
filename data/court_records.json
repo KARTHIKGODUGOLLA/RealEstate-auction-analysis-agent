@@ -1,0 +1,262 @@
+{
+  "OC-2026-1001": {
+    "parcel_id": "OC-2026-1001",
+    "foreclosure_cases": [
+      {
+        "case_number": "2024-CA-1510",
+        "filed_date": "2024-01-16",
+        "plaintiff": "Quicken Loans Inc.",
+        "status": "Active",
+        "type": "Mortgage foreclosure"
+      }
+    ],
+    "eviction_cases": [],
+    "lawsuits": [
+      {
+        "case_number": "2024-CC-8267",
+        "filed_date": "2024-02-03",
+        "plaintiff": "Capital One Bank",
+        "status": "Active",
+        "type": "Civil collection"
+      }
+    ],
+    "probate": []
+  },
+  "OC-2026-1002": {
+    "parcel_id": "OC-2026-1002",
+    "foreclosure_cases": [],
+    "eviction_cases": [],
+    "lawsuits": [],
+    "probate": []
+  },
+  "OC-2026-1003": {
+    "parcel_id": "OC-2026-1003",
+    "foreclosure_cases": [
+      {
+        "case_number": "2024-CA-2076",
+        "filed_date": "2024-03-09",
+        "plaintiff": "SunTrust Mortgage",
+        "status": "Active",
+        "type": "Mortgage foreclosure"
+      }
+    ],
+    "eviction_cases": [],
+    "lawsuits": [],
+    "probate": []
+  },
+  "OC-2026-1004": {
+    "parcel_id": "OC-2026-1004",
+    "foreclosure_cases": [],
+    "eviction_cases": [],
+    "lawsuits": [],
+    "probate": []
+  },
+  "OC-2026-1005": {
+    "parcel_id": "OC-2026-1005",
+    "foreclosure_cases": [
+      {
+        "case_number": "2020-CA-9692",
+        "filed_date": "2020-05-15",
+        "plaintiff": "SunTrust Mortgage",
+        "status": "Dismissed",
+        "type": "Mortgage foreclosure"
+      }
+    ],
+    "eviction_cases": [],
+    "lawsuits": [],
+    "probate": []
+  },
+  "OC-2026-1006": {
+    "parcel_id": "OC-2026-1006",
+    "foreclosure_cases": [
+      {
+        "case_number": "2020-CA-2874",
+        "filed_date": "2020-11-21",
+        "plaintiff": "SunTrust Mortgage",
+        "status": "Dismissed",
+        "type": "Mortgage foreclosure"
+      }
+    ],
+    "eviction_cases": [],
+    "lawsuits": [],
+    "probate": []
+  },
+  "OC-2026-1007": {
+    "parcel_id": "OC-2026-1007",
+    "foreclosure_cases": [
+      {
+        "case_number": "2024-CA-8398",
+        "filed_date": "2024-04-14",
+        "plaintiff": "Chase Home Finance",
+        "status": "Active",
+        "type": "Mortgage foreclosure"
+      }
+    ],
+    "eviction_cases": [],
+    "lawsuits": [
+      {
+        "case_number": "2024-CC-2557",
+        "filed_date": "2024-06-14",
+        "plaintiff": "Capital One Bank",
+        "status": "Active",
+        "type": "Civil collection"
+      }
+    ],
+    "probate": []
+  },
+  "OC-2026-1008": {
+    "parcel_id": "OC-2026-1008",
+    "foreclosure_cases": [
+      {
+        "case_number": "2024-CA-7132",
+        "filed_date": "2024-03-22",
+        "plaintiff": "Quicken Loans Inc.",
+        "status": "Active",
+        "type": "Mortgage foreclosure"
+      }
+    ],
+    "eviction_cases": [
+      {
+        "case_number": "2023-CC-2398",
+        "filed_date": "2023-02-14",
+        "plaintiff": "Orange Asset Mgmt LLC",
+        "status": "Writ issued",
+        "type": "Residential eviction"
+      }
+    ],
+    "lawsuits": [
+      {
+        "case_number": "2024-CC-7105",
+        "filed_date": "2024-03-18",
+        "plaintiff": "LVNV Funding LLC",
+        "status": "Active",
+        "type": "Civil collection"
+      }
+    ],
+    "probate": []
+  },
+  "OC-2026-1009": {
+    "parcel_id": "OC-2026-1009",
+    "foreclosure_cases": [],
+    "eviction_cases": [],
+    "lawsuits": [],
+    "probate": []
+  },
+  "OC-2026-1010": {
+    "parcel_id": "OC-2026-1010",
+    "foreclosure_cases": [
+      {
+        "case_number": "2020-CA-3002",
+        "filed_date": "2020-07-12",
+        "plaintiff": "Citi Mortgage Inc.",
+        "status": "Dismissed",
+        "type": "Mortgage foreclosure"
+      }
+    ],
+    "eviction_cases": [],
+    "lawsuits": [],
+    "probate": []
+  },
+  "OC-2026-1011": {
+    "parcel_id": "OC-2026-1011",
+    "foreclosure_cases": [
+      {
+        "case_number": "2024-CA-1842",
+        "filed_date": "2024-05-20",
+        "plaintiff": "Chase Home Finance",
+        "status": "Active",
+        "type": "Mortgage foreclosure"
+      }
+    ],
+    "eviction_cases": [
+      {
+        "case_number": "2023-CC-9313",
+        "filed_date": "2023-04-05",
+        "plaintiff": "Robert Smith",
+        "status": "Writ issued",
+        "type": "Residential eviction"
+      }
+    ],
+    "lawsuits": [],
+    "probate": []
+  },
+  "OC-2026-1012": {
+    "parcel_id": "OC-2026-1012",
+    "foreclosure_cases": [
+      {
+        "case_number": "2020-CA-2773",
+        "filed_date": "2020-06-28",
+        "plaintiff": "SunTrust Mortgage",
+        "status": "Dismissed",
+        "type": "Mortgage foreclosure"
+      }
+    ],
+    "eviction_cases": [],
+    "lawsuits": [],
+    "probate": []
+  },
+  "OC-2026-1013": {
+    "parcel_id": "OC-2026-1013",
+    "foreclosure_cases": [],
+    "eviction_cases": [],
+    "lawsuits": [],
+    "probate": []
+  },
+  "OC-2026-1014": {
+    "parcel_id": "OC-2026-1014",
+    "foreclosure_cases": [],
+    "eviction_cases": [],
+    "lawsuits": [],
+    "probate": []
+  },
+  "OC-2026-1015": {
+    "parcel_id": "OC-2026-1015",
+    "foreclosure_cases": [],
+    "eviction_cases": [],
+    "lawsuits": [],
+    "probate": []
+  },
+  "OC-2026-1016": {
+    "parcel_id": "OC-2026-1016",
+    "foreclosure_cases": [],
+    "eviction_cases": [],
+    "lawsuits": [],
+    "probate": []
+  },
+  "OC-2026-1017": {
+    "parcel_id": "OC-2026-1017",
+    "foreclosure_cases": [],
+    "eviction_cases": [],
+    "lawsuits": [],
+    "probate": []
+  },
+  "OC-2026-1018": {
+    "parcel_id": "OC-2026-1018",
+    "foreclosure_cases": [],
+    "eviction_cases": [],
+    "lawsuits": [
+      {
+        "case_number": "2023-CC-5381",
+        "filed_date": "2023-01-06",
+        "plaintiff": "Capital One Bank",
+        "status": "Closed - Judgment entered",
+        "type": "Civil collection"
+      }
+    ],
+    "probate": []
+  },
+  "OC-2026-1019": {
+    "parcel_id": "OC-2026-1019",
+    "foreclosure_cases": [],
+    "eviction_cases": [],
+    "lawsuits": [],
+    "probate": []
+  },
+  "OC-2026-1020": {
+    "parcel_id": "OC-2026-1020",
+    "foreclosure_cases": [],
+    "eviction_cases": [],
+    "lawsuits": [],
+    "probate": []
+  }
+}
