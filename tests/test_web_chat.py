@@ -1,6 +1,12 @@
 import unittest
 
-from auction_agent.web import _is_collection_prompt, _is_unhelpful_rasa_answer, _local_advisor_reply
+from auction_agent.web import (
+    _is_collection_prompt,
+    _is_too_long_for_voice,
+    _is_unhelpful_rasa_answer,
+    _local_advisor_reply,
+    _should_use_demo_answer,
+)
 
 
 class WebChatFallbackTest(unittest.TestCase):
@@ -17,7 +23,7 @@ class WebChatFallbackTest(unittest.TestCase):
         )
 
         self.assertEqual(reply["source"], "local-demo-fallback")
-        self.assertIn("maximum safe bid", reply["text"])
+        self.assertIn("Max safe bid", reply["text"])
         self.assertIn("not bid above", reply["text"])
 
     def test_local_chat_fallback_answers_risk_questions(self):
@@ -26,8 +32,8 @@ class WebChatFallbackTest(unittest.TestCase):
             {"parcelId": "6013-fender-court", "availableCash": "40000"},
         )
 
-        self.assertIn("main issue", reply["text"])
-        self.assertIn("Highest-priority checks", reply["text"])
+        self.assertIn("Main risk", reply["text"])
+        self.assertIn("Check", reply["text"])
 
     def test_collection_prompt_detection_catches_rasa_slot_questions(self):
         self.assertTrue(_is_collection_prompt(["What repair budget should I assume?"]))
@@ -36,6 +42,11 @@ class WebChatFallbackTest(unittest.TestCase):
     def test_unhelpful_rasa_answer_detection_catches_context_failures(self):
         self.assertTrue(_is_unhelpful_rasa_answer(["I can't calculate your maximum safe bid."]))
         self.assertFalse(_is_unhelpful_rasa_answer(["Your maximum safe bid is $114,035."]))
+
+    def test_voice_demo_prefers_concise_answers(self):
+        self.assertTrue(_should_use_demo_answer("Explain my maximum safe bid for this selected property."))
+        self.assertTrue(_is_too_long_for_voice(["x" * 901]))
+        self.assertFalse(_is_too_long_for_voice(["short answer"]))
 
 
 if __name__ == "__main__":

@@ -20,14 +20,18 @@ const currency = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
-let voiceRepliesEnabled = "speechSynthesis" in window;
+let voiceRepliesEnabled = true;
 let selectedVoice = null;
 let speechQueue = [];
 let speechActive = false;
 let currentThinkingBubble = null;
-const openingMessage = "Select a property, then ask me whether to bid. I will use the selected deal details and your buyer profile.";
+let replyAudio = new Audio();
+let primedAudio = false;
+let chatBusy = false;
+const openingMessage = "Pick a property and ask for the call. I will keep the answer short enough to hear.";
 
 hydrateVoiceControls();
+hydrateVoiceInputControls();
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -53,7 +57,7 @@ testVoice.addEventListener("click", () => {
   voiceRepliesEnabled = true;
   voiceReplyToggle.textContent = "Voice replies on";
   voiceReplyToggle.setAttribute("aria-pressed", "true");
-  speak("Voice check. Auction Advisor is ready to talk through the selected deal.");
+  speak("Voice is on. Ask for the bid call when you're ready.");
 });
 
 clearChat.addEventListener("click", () => {
@@ -94,13 +98,14 @@ askMaxBid.addEventListener("click", async () => {
 
 propertySelect.addEventListener("change", () => {
   const selected = propertySelect.selectedOptions[0];
-  if (!selected?.dataset.address) return;
-  form.elements.address.value = selected.dataset.address.split(",")[0];
+  const selectedDeal = normalizeSelectedDeal(selected);
+  form.elements.address.value = selectedDeal.address.split(",")[0];
   form.elements.city.value = "Orlando";
-  form.elements.currentBid.value = selected.dataset.currentBid || selected.dataset.minimumBid;
+  form.elements.currentBid.value = selectedDeal.currentBid;
   form.elements.estimatedRepairs.value = "";
   form.elements.marketRent.value = "";
-  renderPropertySummary(selected);
+  renderPropertySummary(selectedDeal);
+  resetChatForSelection(selectedDeal);
   analyze();
 });
 
@@ -108,13 +113,15 @@ voiceButton.addEventListener("click", () => {
   unlockSpeech();
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
-    voiceStatus.textContent = "Voice input is not available in this browser. Use the text form for the demo.";
+    voiceStatus.textContent = "Firefox does not support mic dictation here. Voice replies still work; type the question or open Chrome/Safari for Ask by voice.";
+    rasaMessage.focus();
     return;
   }
 
   const recognition = new SpeechRecognition();
   recognition.lang = "en-US";
   recognition.interimResults = false;
+  recognition.continuous = false;
   recognition.onstart = () => {
     voiceStatus.textContent = "Listening...";
   };
@@ -124,37 +131,62 @@ voiceButton.addEventListener("click", () => {
     voiceStatus.textContent = `Heard: "${transcript}"`;
     sendRasaMessage(transcript);
   };
-  recognition.onerror = () => {
-    voiceStatus.textContent = "Voice input had trouble hearing that. Text fallback is ready.";
+  recognition.onend = () => {
+    if (voiceStatus.textContent === "Listening...") {
+      voiceStatus.textContent = "Listening stopped. Try Ask by voice again or type the question.";
+    }
   };
-  recognition.start();
+  recognition.onerror = (event) => {
+    const reason = event.error === "not-allowed"
+      ? "Microphone permission was blocked."
+      : "Voice input had trouble hearing that.";
+    voiceStatus.textContent = `${reason} Text fallback is ready.`;
+    rasaMessage.focus();
+  };
+  try {
+    recognition.start();
+  } catch {
+    voiceStatus.textContent = "Voice input could not start. Text fallback is ready.";
+    rasaMessage.focus();
+  }
 });
 
 async function analyze(options = {}) {
   const { speakResult = false } = options;
   setLoading(true);
-  const payload = Object.fromEntries(new FormData(form).entries());
-  const response = await fetch("/api/analyze", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  const analysis = await response.json();
-  render(analysis);
-  if (speakResult) {
-    speakRecommendation(analysis);
+  try {
+    const payload = Object.fromEntries(new FormData(form).entries());
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      throw new Error(`Analysis failed with HTTP ${response.status}`);
+    }
+    const analysis = await response.json();
+    render(analysis);
+    if (speakResult) {
+      speakRecommendation(analysis);
+    }
+  } catch (error) {
+    appendMessage("error", `Analysis is unavailable: ${error.message}. Restart the local web server and try again.`);
+    voiceStatus.textContent = "Analysis backend is not reachable.";
+  } finally {
+    setLoading(false);
   }
-  setLoading(false);
 }
 
 async function sendRasaMessage(quickMessage = null) {
+  if (chatBusy) return;
   const message = (quickMessage || rasaMessage.value).trim();
   if (!message) return;
+  chatBusy = true;
   const enrichedMessage = enrichForSelectedProperty(message);
   appendMessage("user", message);
   showThinking();
   rasaMessage.value = "";
-  rasaSend.disabled = true;
+  setChatBusy(true);
   rasaSend.textContent = "Sending";
   try {
     const response = await fetch("/api/rasa-chat", {
@@ -185,7 +217,8 @@ async function sendRasaMessage(quickMessage = null) {
     hideThinking();
     appendMessage("error", `Could not reach the local Rasa proxy: ${error.message}`);
   } finally {
-    rasaSend.disabled = false;
+    chatBusy = false;
+    setChatBusy(false);
     rasaSend.textContent = "Send";
   }
 }
@@ -240,12 +273,10 @@ function hideThinking() {
 
 function speakRecommendation(analysis) {
   const rec = analysis.recommendation;
-  const hidden = analysis.hidden_costs;
   const text = [
     `${rec.category}.`,
-    rec.summary,
-    `The biggest risk is ${rec.biggest_risk}.`,
-    hidden.summary,
+    `Max safe bid ${currency.format(rec.max_safe_bid)}.`,
+    `Main issue: ${rec.biggest_risk}.`,
   ].join(" ");
   speak(text);
 }
@@ -268,7 +299,19 @@ function hydrateVoiceControls() {
   window.speechSynthesis.onvoiceschanged = loadVoices;
 }
 
+function hydrateVoiceInputControls() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SpeechRecognition) return;
+
+  voiceButton.classList.add("unsupported");
+  voiceButton.setAttribute("aria-disabled", "true");
+  voiceButton.querySelector("span:last-child").textContent = "Mic unavailable";
+  voiceButton.title = "Firefox does not support browser speech recognition. Typed chat and voice replies still work.";
+  voiceStatus.textContent = "Firefox can play voice replies, but mic input needs Chrome or Safari. Type a question below for this browser.";
+}
+
 function unlockSpeech() {
+  primeAudio();
   if (!("speechSynthesis" in window)) return;
   if (!selectedVoice) {
     selectedVoice = window.speechSynthesis.getVoices()[0] || null;
@@ -283,9 +326,14 @@ async function speak(text) {
   const cleanText = text
     .replace(/\s+/g, " ")
     .replace(/\$([0-9,]+)/g, "$1 dollars")
-    .slice(0, 900);
+    .slice(0, 420);
 
+  stopSpeaking();
   if (await speakWithSystemVoice(cleanText)) {
+    return;
+  }
+
+  if (await speakWithGeneratedAudio(cleanText)) {
     return;
   }
 
@@ -301,16 +349,57 @@ async function speak(text) {
 
 async function speakWithSystemVoice(text) {
   try {
+    voiceStatus.textContent = "Speaking with local system voice...";
     const response = await fetch("/api/speak", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text }),
     });
     const payload = await response.json();
-    if (!payload.ok) return false;
-    voiceStatus.textContent = "Speaking response with system voice...";
+    if (!payload.ok) {
+      voiceStatus.textContent = "Local system voice failed. Trying browser audio...";
+      return false;
+    }
     return true;
   } catch {
+    voiceStatus.textContent = "Local system voice failed. Trying browser audio...";
+    return false;
+  }
+}
+
+async function speakWithGeneratedAudio(text) {
+  try {
+    voiceStatus.textContent = "Generating voice reply...";
+    const response = await fetch("/api/tts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+    if (!response.ok || !response.headers.get("Content-Type")?.includes("audio/")) {
+      return false;
+    }
+    const blob = await response.blob();
+    const audioUrl = URL.createObjectURL(blob);
+    replyAudio.pause();
+    if (replyAudio.src?.startsWith("blob:")) {
+      URL.revokeObjectURL(replyAudio.src);
+    }
+    replyAudio = new Audio(audioUrl);
+    replyAudio.onplay = () => {
+      voiceStatus.textContent = "Speaking response...";
+    };
+    replyAudio.onended = () => {
+      voiceStatus.textContent = "Ready for the next question.";
+      URL.revokeObjectURL(audioUrl);
+    };
+    replyAudio.onerror = () => {
+      voiceStatus.textContent = "Audio playback failed. Text response is still available.";
+      URL.revokeObjectURL(audioUrl);
+    };
+    await replyAudio.play();
+    return true;
+  } catch {
+    voiceStatus.textContent = "Generated voice was blocked. Trying browser voice...";
     return false;
   }
 }
@@ -351,10 +440,34 @@ function playNextSpeech() {
 }
 
 function stopSpeaking() {
+  replyAudio.pause();
+  if (replyAudio.src?.startsWith("blob:")) {
+    URL.revokeObjectURL(replyAudio.src);
+  }
+  replyAudio = new Audio();
   window.speechSynthesis?.cancel();
   speechQueue = [];
   speechActive = false;
   fetch("/api/stop-speech", { method: "POST" }).catch(() => {});
+}
+
+function setChatBusy(isBusy) {
+  rasaSend.disabled = isBusy;
+  askDecision.disabled = isBusy;
+  askRisks.disabled = isBusy;
+  askMaxBid.disabled = isBusy;
+}
+
+function primeAudio() {
+  if (primedAudio) return;
+  primedAudio = true;
+  const silentAudio =
+    "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=";
+  const audio = new Audio(silentAudio);
+  audio.volume = 0;
+  audio.play().catch(() => {
+    primedAudio = false;
+  });
 }
 
 function getAnalysisPayload() {
@@ -364,6 +477,11 @@ function getAnalysisPayload() {
 async function loadProperties() {
   const response = await fetch("/api/properties");
   const payload = await response.json();
+  const defaultOption = propertySelect.options[0];
+  defaultOption.dataset.address = "6013 Fender Court";
+  defaultOption.dataset.currentBid = "170000";
+  defaultOption.dataset.minimumBid = "170000";
+  defaultOption.dataset.deposit = "25000";
   payload.properties.forEach((property) => {
     const option = document.createElement("option");
     option.value = property.parcel_id;
@@ -375,15 +493,23 @@ async function loadProperties() {
     option.dataset.deposit = property.deposit_required || "";
     propertySelect.appendChild(option);
   });
-  renderPropertySummary(propertySelect.selectedOptions[0]);
+  renderPropertySummary(normalizeSelectedDeal(propertySelect.selectedOptions[0]));
 }
 
-function renderPropertySummary(selected) {
-  if (!selected) return;
-  const address = selected.dataset.address || "6013 Fender Court";
-  const bid = selected.dataset.currentBid || selected.dataset.minimumBid || form.elements.currentBid.value;
-  const deposit = selected.dataset.deposit;
-  const auctionDate = selected.dataset.auctionDate;
+function normalizeSelectedDeal(selected) {
+  return {
+    address: selected?.dataset.address || "6013 Fender Court",
+    currentBid: selected?.dataset.currentBid || selected?.dataset.minimumBid || form.elements.currentBid.value || "170000",
+    deposit: selected?.dataset.deposit || "25000",
+    auctionDate: selected?.dataset.auctionDate || "",
+  };
+}
+
+function renderPropertySummary(deal) {
+  const address = deal.address;
+  const bid = deal.currentBid;
+  const deposit = deal.deposit;
+  const auctionDate = deal.auctionDate;
   propertySummary.innerHTML = `
     <span>Selected deal</span>
     <strong>${address}</strong>
@@ -393,6 +519,13 @@ function renderPropertySummary(selected) {
       auctionDate ? `Auction ${auctionDate}` : null,
     ].filter(Boolean).join(" · ") || "Official auction facts and diligence assumptions loaded."}</small>
   `;
+}
+
+function resetChatForSelection(deal) {
+  stopSpeaking();
+  rasaTranscript.innerHTML = "";
+  appendMessage("agent", `Loaded ${deal.address.split(",")[0]}. Ask whether to bid, what could go wrong, or the max bid.`);
+  voiceStatus.textContent = "Deal loaded. Voice replies are ready.";
 }
 
 function render(analysis) {

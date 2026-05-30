@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
+import tempfile
 from dataclasses import asdict, is_dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -58,6 +60,9 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
             return
         if self.path == "/api/speak":
             self._speak_locally()
+            return
+        if self.path == "/api/tts":
+            self._generate_tts_audio()
             return
         if self.path == "/api/stop-speech":
             self._stop_local_speech()
@@ -118,6 +123,50 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
         )
         self._send_json({"ok": True, "engine": "macos-say"})
 
+    def _generate_tts_audio(self) -> None:
+        length = int(self.headers.get("Content-Length", "0"))
+        payload = json.loads(self.rfile.read(length) or b"{}")
+        text = _speech_text(payload.get("text", ""))
+        if not text:
+            self._send_json({"ok": False, "error": "No text to speak."}, status=400)
+            return
+
+        say_path = shutil.which("say")
+        if not say_path:
+            self._send_json({"ok": False, "error": "macOS say is unavailable."}, status=503)
+            return
+
+        fd, audio_path = tempfile.mkstemp(suffix=".m4a")
+        os.close(fd)
+        try:
+            subprocess.run(
+                [
+                    say_path,
+                    "-o",
+                    audio_path,
+                    "--file-format=m4af",
+                    "--data-format=aac",
+                    text,
+                ],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE,
+                timeout=20,
+            )
+            body = Path(audio_path).read_bytes()
+        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+            self._send_json({"ok": False, "error": f"Could not generate speech audio: {exc}"}, status=500)
+            return
+        finally:
+            Path(audio_path).unlink(missing_ok=True)
+
+        self.send_response(200)
+        self.send_header("Content-Type", "audio/mp4")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
     def _stop_local_speech(self) -> None:
         _stop_speech_process()
         self._send_json({"ok": True})
@@ -128,6 +177,15 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
         message = payload.get("message", "")
         sender = payload.get("sender", "web-demo")
         fallback = _local_advisor_reply(message, payload.get("context", {}))
+        if _should_use_demo_answer(message):
+            body = json.dumps([fallback]).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
         rasa_payload = json.dumps({"sender": sender, "message": message}).encode("utf-8")
         request = Request(
             "http://127.0.0.1:5005/webhooks/rest/webhook",
@@ -150,7 +208,12 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
             else:
                 texts = [item.get("text", "") for item in messages if isinstance(item, dict)]
                 has_text = any(texts)
-                if not has_text or _is_collection_prompt(texts) or _is_unhelpful_rasa_answer(texts):
+                if (
+                    not has_text
+                    or _is_collection_prompt(texts)
+                    or _is_unhelpful_rasa_answer(texts)
+                    or _is_too_long_for_voice(texts)
+                ):
                     fallback["rasa_status"] = (
                         "Rasa returned no speakable answer."
                         if not has_text
@@ -175,9 +238,9 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _send_json(self, payload: dict[str, Any]) -> None:
+    def _send_json(self, payload: dict[str, Any], status: int = 200) -> None:
         body = json.dumps(payload).encode("utf-8")
-        self.send_response(200)
+        self.send_response(status)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
@@ -207,7 +270,7 @@ def _to_int(value: Any) -> int | None:
 
 
 def _speech_text(value: Any) -> str:
-    return " ".join(str(value).split()).replace("$", " dollars ").replace("%", " percent ")[:900]
+    return " ".join(str(value).split()).replace("$", " dollars ").replace("%", " percent ")[:420]
 
 
 def _stop_speech_process() -> None:
@@ -248,33 +311,39 @@ def _local_advisor_reply(message: str, context: dict[str, Any] | None) -> dict[s
     rental = analysis.rental_yield
     prop = analysis.property_data
 
-    prefix = "Demo fallback answer: "
     if any(term in prompt for term in ("max", "maximum", "safe bid", "bid above")):
-        answer = (
-            f"{prefix}your maximum safe bid is ${rec.max_safe_bid:,.0f}. "
-            f"I would not bid above ${rec.do_not_bid_above:,.0f}. "
-            f"At the current bid of ${prop['current_bid']:,.0f}, cash needed is about "
-            f"${buying.cash_needed_at_current_bid:,.0f}, leaving "
-            f"${buying.remaining_cash_at_current_bid:,.0f} after deposit, closing costs, "
-            "repairs, and reserve."
-        )
+        if rec.max_safe_bid <= 0:
+            answer = (
+                "Bid call: pass at this price. "
+                f"The current bid needs about {_money(buying.cash_needed_at_current_bid)} cash, "
+                f"which leaves {_money(buying.remaining_cash_at_current_bid)} after reserves. "
+                "That is too tight for this buyer profile."
+            )
+        else:
+            answer = (
+                f"Max safe bid: {_money(rec.max_safe_bid)}. "
+                f"Do not bid above {_money(rec.do_not_bid_above)}. "
+                f"The current bid needs about {_money(buying.cash_needed_at_current_bid)} cash, "
+                f"which leaves {_money(buying.remaining_cash_at_current_bid)}; that is too tight for this profile."
+            )
     elif any(term in prompt for term in ("wrong", "risk", "risks", "cost", "lien", "title")):
         top_risks = [
             item["source"]
             for item in hidden.checklist
             if item["risk_level"] == "high" and item["status"] in {"risk_found", "needs_review", "not_checked"}
         ][:3]
+        risk_list = ", ".join(top_risks) if top_risks else "taxes, title, and code records"
         answer = (
-            f"{prefix}the main issue is {rec.biggest_risk}. "
-            f"{hidden.summary} Highest-priority checks: {', '.join(top_risks)}. "
-            "Do those before placing a live bid."
+            f"Main risk: {rec.biggest_risk}. "
+            f"Check {risk_list} before bidding. "
+            f"My recommendation stays {rec.category.lower()} until those records are clean."
         )
     else:
+        decision = "Pass for now" if rec.category == "Red light" else "Proceed only with verification"
         answer = (
-            f"{prefix}{rec.category}. {rec.summary} "
-            f"The rental estimate is ${rental.monthly_cash_flow:,.0f} per month at the current bid, "
-            f"with a {rental.cap_rate:.1%} cap rate. "
-            f"The biggest risk is {rec.biggest_risk}."
+            f"{decision}. {rec.category}; max safe bid {_money(rec.max_safe_bid)}. "
+            f"Projected cash flow is {_money(rental.monthly_cash_flow)} per month, "
+            f"and the key blocker is {rec.biggest_risk}."
         )
 
     return {"text": answer, "source": "local-demo-fallback"}
@@ -282,6 +351,11 @@ def _local_advisor_reply(message: str, context: dict[str, Any] | None) -> dict[s
 
 def _wants_live_official_data(payload: dict[str, Any]) -> bool:
     return str(payload.get("useOfficialData", "")).lower() in {"1", "true", "yes", "on"}
+
+
+def _money(value: int | float) -> str:
+    prefix = "-$" if value < 0 else "$"
+    return f"{prefix}{abs(value):,.0f}"
 
 
 def _is_collection_prompt(texts: list[str]) -> bool:
@@ -313,6 +387,26 @@ def _is_unhelpful_rasa_answer(texts: list[str]) -> bool:
         "provide a repair budget",
     )
     return any(phrase in combined for phrase in unhelpful_phrases)
+
+
+def _is_too_long_for_voice(texts: list[str]) -> bool:
+    return len(" ".join(texts)) > 900
+
+
+def _should_use_demo_answer(message: str) -> bool:
+    prompt = message.lower()
+    demo_terms = (
+        "should i bid",
+        "maximum safe bid",
+        "max bid",
+        "bid above",
+        "what could go wrong",
+        "risk",
+        "risks",
+        "selected property",
+        "auction property",
+    )
+    return any(term in prompt for term in demo_terms)
 
 
 if __name__ == "__main__":
