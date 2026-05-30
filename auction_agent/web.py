@@ -58,6 +58,9 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
         if self.path == "/api/rasa-chat":
             self._proxy_rasa_message()
             return
+        if self.path == "/api/spotlight":
+            self._spotlight()
+            return
         if self.path == "/api/speak":
             self._speak_locally()
             return
@@ -100,6 +103,47 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    def _spotlight(self) -> None:
+        length = int(self.headers.get("Content-Length", "0"))
+        payload = json.loads(self.rfile.read(length) or b"{}")
+        profile_overrides = {
+            "available_cash": _to_int(payload.get("availableCash")),
+            "financing_type": payload.get("financingType") or None,
+            "investment_goal": payload.get("investmentGoal") or None,
+        }
+        analyses = []
+        for listing in list_prepared_properties():
+            analysis = analyze_auction(
+                property_id=listing["parcel_id"],
+                profile_overrides=profile_overrides,
+                use_official_data=False,
+            )
+            analyses.append(_spotlight_card(analysis))
+        seeded = analyze_auction(
+            property_id="6013-fender-court",
+            profile_overrides=profile_overrides,
+            use_official_data=False,
+        )
+        analyses.append(_spotlight_card(seeded))
+
+        best_fit = max(
+            analyses,
+            key=lambda item: (
+                item["score"],
+                item["cash_gap"],
+                item["monthly_cash_flow"],
+            ),
+        )
+        biggest_trap = min(
+            analyses,
+            key=lambda item: (
+                item["cash_gap"],
+                item["monthly_cash_flow"],
+                -item["risk_count"],
+            ),
+        )
+        self._send_json({"best_fit": best_fit, "biggest_trap": biggest_trap})
 
     def _speak_locally(self) -> None:
         length = int(self.headers.get("Content-Length", "0"))
@@ -356,6 +400,28 @@ def _wants_live_official_data(payload: dict[str, Any]) -> bool:
 def _money(value: int | float) -> str:
     prefix = "-$" if value < 0 else "$"
     return f"{prefix}{abs(value):,.0f}"
+
+
+def _spotlight_card(analysis: Any) -> dict[str, Any]:
+    prop = analysis.property_data
+    rec = analysis.recommendation
+    buying = analysis.buying_power
+    rental = analysis.rental_yield
+    hidden = analysis.hidden_costs
+    parcel_id = prop.get("property_id") or "6013-fender-court"
+    address = prop.get("full_address") or f"{prop['address']}, {prop['city']}, {prop['state']}"
+    return {
+        "parcel_id": parcel_id,
+        "address": address,
+        "score": rec.score,
+        "category": rec.category,
+        "max_safe_bid": rec.max_safe_bid,
+        "current_bid": prop["current_bid"],
+        "cash_gap": buying.remaining_cash_at_current_bid,
+        "monthly_cash_flow": rental.monthly_cash_flow,
+        "risk_count": hidden.high_risk_count + hidden.risk_found_count,
+        "reason": rec.biggest_risk,
+    }
 
 
 def _is_collection_prompt(texts: list[str]) -> bool:

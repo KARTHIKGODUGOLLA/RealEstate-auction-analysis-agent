@@ -5,8 +5,10 @@ from auction_agent.web import (
     _is_too_long_for_voice,
     _is_unhelpful_rasa_answer,
     _local_advisor_reply,
+    _spotlight_card,
     _should_use_demo_answer,
 )
+from auction_agent.engine import analyze_auction
 
 
 class WebChatFallbackTest(unittest.TestCase):
@@ -47,6 +49,14 @@ class WebChatFallbackTest(unittest.TestCase):
         self.assertTrue(_should_use_demo_answer("Explain my maximum safe bid for this selected property."))
         self.assertTrue(_is_too_long_for_voice(["x" * 901]))
         self.assertFalse(_is_too_long_for_voice(["short answer"]))
+
+    def test_spotlight_card_has_demo_metrics(self):
+        card = _spotlight_card(analyze_auction(use_official_data=False))
+
+        self.assertIn("address", card)
+        self.assertIn("score", card)
+        self.assertIn("cash_gap", card)
+        self.assertIn("monthly_cash_flow", card)
 
 
 if __name__ == "__main__":

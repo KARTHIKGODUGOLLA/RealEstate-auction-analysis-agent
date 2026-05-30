@@ -13,6 +13,9 @@ const clearChat = document.querySelector("#clearChat");
 const askDecision = document.querySelector("#askDecision");
 const askRisks = document.querySelector("#askRisks");
 const askMaxBid = document.querySelector("#askMaxBid");
+const pitchMode = document.querySelector("#pitchMode");
+const bestFit = document.querySelector("#bestFit");
+const biggestTrap = document.querySelector("#biggestTrap");
 
 const currency = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -94,6 +97,21 @@ askRisks.addEventListener("click", async () => {
 askMaxBid.addEventListener("click", async () => {
   unlockSpeech();
   await sendRasaMessage("Explain my maximum safe bid for this property.");
+});
+
+pitchMode.addEventListener("click", async () => {
+  unlockSpeech();
+  await runPitchMode();
+});
+
+bestFit.addEventListener("click", async () => {
+  unlockSpeech();
+  await applySpotlight("best_fit");
+});
+
+biggestTrap.addEventListener("click", async () => {
+  unlockSpeech();
+  await applySpotlight("biggest_trap");
 });
 
 propertySelect.addEventListener("change", () => {
@@ -221,6 +239,69 @@ async function sendRasaMessage(quickMessage = null) {
     setChatBusy(false);
     rasaSend.textContent = "Send";
   }
+}
+
+async function runPitchMode() {
+  if (chatBusy) return;
+  const spotlight = await loadSpotlight();
+  if (!spotlight) return;
+  await selectPropertyByParcel(spotlight.biggest_trap.parcel_id);
+  stopSpeaking();
+  rasaTranscript.innerHTML = "";
+  appendMessage("agent", `Here is the judge-ready story: this agent does not just chat. It decides.`);
+  appendMessage(
+    "agent",
+    `Trap found: ${street(spotlight.biggest_trap.address)} needs ${currency.format(spotlight.biggest_trap.current_bid)} today and still leaves ${money(spotlight.biggest_trap.cash_gap)} after cash-to-close.`
+  );
+  appendMessage(
+    "agent",
+    `Best fit: ${street(spotlight.best_fit.address)} scores ${spotlight.best_fit.score}/100 with ${money(spotlight.best_fit.monthly_cash_flow)} monthly cash flow.`
+  );
+  speak(
+    `Judge story: the agent screens the whole auction list, flags the trap, and gives a bid call in seconds. Biggest trap: ${street(spotlight.biggest_trap.address)}. Best fit: ${street(spotlight.best_fit.address)}.`
+  );
+}
+
+async function applySpotlight(kind) {
+  if (chatBusy) return;
+  const spotlight = await loadSpotlight();
+  if (!spotlight) return;
+  const card = spotlight[kind];
+  await selectPropertyByParcel(card.parcel_id);
+  stopSpeaking();
+  rasaTranscript.innerHTML = "";
+  const label = kind === "best_fit" ? "Best fit" : "Biggest trap";
+  const text = `${label}: ${street(card.address)}. Score ${card.score}/100, cash gap ${money(card.cash_gap)}, projected cash flow ${money(card.monthly_cash_flow)} per month. Main issue: ${card.reason}.`;
+  appendMessage("agent", text);
+  speak(text);
+}
+
+async function loadSpotlight() {
+  setDemoControlsBusy(true);
+  try {
+    const response = await fetch("/api/spotlight", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(getAnalysisPayload()),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    appendMessage("error", `Spotlight is unavailable: ${error.message}.`);
+    return null;
+  } finally {
+    setDemoControlsBusy(false);
+  }
+}
+
+async function selectPropertyByParcel(parcelId) {
+  const option = [...propertySelect.options].find((item) => item.value === parcelId);
+  if (!option) return;
+  propertySelect.value = parcelId;
+  propertySelect.dispatchEvent(new Event("change"));
+  await wait(300);
 }
 
 function enrichForSelectedProperty(message) {
@@ -456,6 +537,26 @@ function setChatBusy(isBusy) {
   askDecision.disabled = isBusy;
   askRisks.disabled = isBusy;
   askMaxBid.disabled = isBusy;
+}
+
+function setDemoControlsBusy(isBusy) {
+  pitchMode.disabled = isBusy;
+  bestFit.disabled = isBusy;
+  biggestTrap.disabled = isBusy;
+}
+
+function wait(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function street(address) {
+  return String(address || "").split(",")[0];
+}
+
+function money(value) {
+  const amount = Number(value || 0);
+  const formatted = currency.format(Math.abs(amount));
+  return amount < 0 ? `-${formatted}` : formatted;
 }
 
 function primeAudio() {

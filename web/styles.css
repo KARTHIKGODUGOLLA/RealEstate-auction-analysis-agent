@@ -304,7 +304,8 @@ textarea {
   margin-bottom: 10px;
 }
 
-.quick-actions button {
+.quick-actions button,
+.demo-actions button {
   min-height: 34px;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -314,7 +315,30 @@ textarea {
   font-weight: 800;
 }
 
-.quick-actions button:disabled {
+.demo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #cfdedb;
+  border-radius: 8px;
+  background: #eef7f4;
+}
+
+.demo-actions button {
+  border-color: #b7d2cc;
+  background: #ffffff;
+  color: var(--teal);
+}
+
+#pitchMode {
+  background: var(--teal);
+  color: #ffffff;
+}
+
+.quick-actions button:disabled,
+.demo-actions button:disabled {
   cursor: wait;
   opacity: 0.62;
 }
