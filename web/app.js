@@ -3,11 +3,13 @@ const decisionCard = document.querySelector("#decisionCard");
 const voiceButton = document.querySelector("#voiceButton");
 const voiceReplyToggle = document.querySelector("#voiceReplyToggle");
 const voiceStatus = document.querySelector("#voiceStatus");
+const testVoice = document.querySelector("#testVoice");
 const propertySelect = document.querySelector("#propertySelect");
 const propertySummary = document.querySelector("#propertySummary");
 const rasaTranscript = document.querySelector("#rasaTranscript");
 const rasaMessage = document.querySelector("#rasaMessage");
 const rasaSend = document.querySelector("#rasaSend");
+const clearChat = document.querySelector("#clearChat");
 const askDecision = document.querySelector("#askDecision");
 const askRisks = document.querySelector("#askRisks");
 const askMaxBid = document.querySelector("#askMaxBid");
@@ -19,22 +21,52 @@ const currency = new Intl.NumberFormat("en-US", {
 });
 
 let voiceRepliesEnabled = "speechSynthesis" in window;
+let selectedVoice = null;
+let speechQueue = [];
+let speechActive = false;
+let currentThinkingBubble = null;
+const openingMessage = "Select a property, then ask me whether to bid. I will use the selected deal details and your buyer profile.";
+
+hydrateVoiceControls();
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+  unlockSpeech();
   await analyze({ speakResult: true });
 });
 
 voiceReplyToggle.addEventListener("click", () => {
+  unlockSpeech();
   voiceRepliesEnabled = !voiceRepliesEnabled;
   if (!voiceRepliesEnabled) {
-    window.speechSynthesis?.cancel();
+    stopSpeaking();
   }
   voiceReplyToggle.textContent = voiceRepliesEnabled ? "Voice replies on" : "Voice replies off";
   voiceReplyToggle.setAttribute("aria-pressed", String(voiceRepliesEnabled));
+  voiceStatus.textContent = voiceRepliesEnabled
+    ? "Voice replies are on."
+    : "Voice replies are off. Text chat still works.";
+});
+
+testVoice.addEventListener("click", () => {
+  unlockSpeech();
+  voiceRepliesEnabled = true;
+  voiceReplyToggle.textContent = "Voice replies on";
+  voiceReplyToggle.setAttribute("aria-pressed", "true");
+  speak("Voice check. Auction Advisor is ready to talk through the selected deal.");
+});
+
+clearChat.addEventListener("click", () => {
+  stopSpeaking();
+  rasaTranscript.innerHTML = "";
+  appendMessage("agent", openingMessage);
+  rasaMessage.value = "";
+  rasaMessage.focus();
+  voiceStatus.textContent = "Chat cleared. Ready for the next question.";
 });
 
 rasaSend.addEventListener("click", async () => {
+  unlockSpeech();
   await sendRasaMessage();
 });
 
@@ -46,14 +78,17 @@ rasaMessage.addEventListener("keydown", async (event) => {
 });
 
 askDecision.addEventListener("click", async () => {
+  unlockSpeech();
   await sendRasaMessage("Should I bid on the selected property?");
 });
 
 askRisks.addEventListener("click", async () => {
+  unlockSpeech();
   await sendRasaMessage("What could go wrong with this auction property?");
 });
 
 askMaxBid.addEventListener("click", async () => {
+  unlockSpeech();
   await sendRasaMessage("Explain my maximum safe bid for this property.");
 });
 
@@ -70,6 +105,7 @@ propertySelect.addEventListener("change", () => {
 });
 
 voiceButton.addEventListener("click", () => {
+  unlockSpeech();
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
     voiceStatus.textContent = "Voice input is not available in this browser. Use the text form for the demo.";
@@ -116,16 +152,22 @@ async function sendRasaMessage(quickMessage = null) {
   if (!message) return;
   const enrichedMessage = enrichForSelectedProperty(message);
   appendMessage("user", message);
+  showThinking();
   rasaMessage.value = "";
   rasaSend.disabled = true;
-  rasaSend.textContent = "...";
+  rasaSend.textContent = "Sending";
   try {
     const response = await fetch("/api/rasa-chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sender: "web-demo", message: enrichedMessage }),
+      body: JSON.stringify({
+        sender: "web-demo",
+        message: enrichedMessage,
+        context: getAnalysisPayload(),
+      }),
     });
     const payload = await response.json();
+    hideThinking();
     if (payload.error) {
       appendMessage("error", `${payload.error}\n${payload.detail || ""}`.trim());
       return;
@@ -140,6 +182,7 @@ async function sendRasaMessage(quickMessage = null) {
       speak(text);
     });
   } catch (error) {
+    hideThinking();
     appendMessage("error", `Could not reach the local Rasa proxy: ${error.message}`);
   } finally {
     rasaSend.disabled = false;
@@ -181,6 +224,20 @@ function appendMessage(kind, text) {
   rasaTranscript.scrollTop = rasaTranscript.scrollHeight;
 }
 
+function showThinking() {
+  hideThinking();
+  currentThinkingBubble = document.createElement("div");
+  currentThinkingBubble.className = "message agent thinking";
+  currentThinkingBubble.innerHTML = "<span></span><span></span><span></span>";
+  rasaTranscript.appendChild(currentThinkingBubble);
+  rasaTranscript.scrollTop = rasaTranscript.scrollHeight;
+}
+
+function hideThinking() {
+  currentThinkingBubble?.remove();
+  currentThinkingBubble = null;
+}
+
 function speakRecommendation(analysis) {
   const rec = analysis.recommendation;
   const hidden = analysis.hidden_costs;
@@ -193,26 +250,115 @@ function speakRecommendation(analysis) {
   speak(text);
 }
 
-function speak(text) {
-  if (!voiceRepliesEnabled || !("speechSynthesis" in window)) return;
+function hydrateVoiceControls() {
+  if (!("speechSynthesis" in window)) {
+    voiceStatus.textContent = "Browser voice is unavailable. The local system voice will be tried instead.";
+    return;
+  }
+
+  const loadVoices = () => {
+    const voices = window.speechSynthesis.getVoices();
+    selectedVoice =
+      voices.find((voice) => voice.lang?.startsWith("en-US") && /Samantha|Google|Microsoft|Natural/i.test(voice.name)) ||
+      voices.find((voice) => voice.lang?.startsWith("en")) ||
+      voices[0] ||
+      null;
+  };
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function unlockSpeech() {
+  if (!("speechSynthesis" in window)) return;
+  if (!selectedVoice) {
+    selectedVoice = window.speechSynthesis.getVoices()[0] || null;
+  }
+  if (window.speechSynthesis.paused) {
+    window.speechSynthesis.resume();
+  }
+}
+
+async function speak(text) {
+  if (!voiceRepliesEnabled) return;
   const cleanText = text
     .replace(/\s+/g, " ")
     .replace(/\$([0-9,]+)/g, "$1 dollars")
     .slice(0, 900);
-  window.speechSynthesis.cancel();
+
+  if (await speakWithSystemVoice(cleanText)) {
+    return;
+  }
+
+  if (!("speechSynthesis" in window)) {
+    voiceStatus.textContent = "Voice reply is unavailable in this browser.";
+    return;
+  }
+
+  speechQueue.push(cleanText);
+  voiceStatus.textContent = speechActive ? "Queued voice response..." : "Preparing voice response...";
+  playNextSpeech();
+}
+
+async function speakWithSystemVoice(text) {
+  try {
+    const response = await fetch("/api/speak", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+    const payload = await response.json();
+    if (!payload.ok) return false;
+    voiceStatus.textContent = "Speaking response with system voice...";
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function playNextSpeech() {
+  if (speechActive || !speechQueue.length || !("speechSynthesis" in window)) return;
+  const cleanText = speechQueue.shift();
   const utterance = new SpeechSynthesisUtterance(cleanText);
+  if (selectedVoice) {
+    utterance.voice = selectedVoice;
+  }
   utterance.rate = 0.96;
   utterance.pitch = 1;
   utterance.onstart = () => {
     voiceStatus.textContent = "Speaking response...";
   };
   utterance.onend = () => {
-    voiceStatus.textContent = "Ready for the next question.";
+    speechActive = false;
+    voiceStatus.textContent = speechQueue.length
+      ? "Speaking next response..."
+      : "Ready for the next question.";
+    playNextSpeech();
   };
   utterance.onerror = () => {
+    speechActive = false;
     voiceStatus.textContent = "Voice reply had trouble. The text response is still available.";
+    playNextSpeech();
   };
+  speechActive = true;
   window.speechSynthesis.speak(utterance);
+  window.setTimeout(() => {
+    if (speechActive && !window.speechSynthesis.speaking) {
+      speechActive = false;
+      voiceStatus.textContent = "Browser voice stayed silent. Try Test voice or use Safari/Chrome with sound enabled.";
+      playNextSpeech();
+    }
+  }, 1200);
+}
+
+function stopSpeaking() {
+  window.speechSynthesis?.cancel();
+  speechQueue = [];
+  speechActive = false;
+  fetch("/api/stop-speech", { method: "POST" }).catch(() => {});
+}
+
+function getAnalysisPayload() {
+  return Object.fromEntries(new FormData(form).entries());
 }
 
 async function loadProperties() {

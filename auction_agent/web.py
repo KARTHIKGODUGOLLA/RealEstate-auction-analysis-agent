@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import shutil
+import subprocess
 from dataclasses import asdict, is_dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -17,6 +19,8 @@ from auction_agent.prepared_data import list_prepared_properties
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC_DIR = ROOT / "web"
+RASA_REPLY_TIMEOUT_SECONDS = 4
+SPEECH_PROCESS: subprocess.Popen[bytes] | None = None
 
 
 class AuctionAdvisorHandler(BaseHTTPRequestHandler):
@@ -52,6 +56,12 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
         if self.path == "/api/rasa-chat":
             self._proxy_rasa_message()
             return
+        if self.path == "/api/speak":
+            self._speak_locally()
+            return
+        if self.path == "/api/stop-speech":
+            self._stop_local_speech()
+            return
         if self.path != "/api/analyze":
             self.send_error(404, "Not found")
             return
@@ -75,6 +85,7 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
             property_id=payload.get("parcelId") or "6013-fender-court",
             property_overrides=property_overrides,
             profile_overrides=profile_overrides,
+            use_official_data=_wants_live_official_data(payload),
         )
         update_buyer_profile(profile_overrides)
         save_analysis(analysis)
@@ -85,11 +96,38 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _speak_locally(self) -> None:
+        length = int(self.headers.get("Content-Length", "0"))
+        payload = json.loads(self.rfile.read(length) or b"{}")
+        text = _speech_text(payload.get("text", ""))
+        if not text:
+            self._send_json({"ok": False, "error": "No text to speak."})
+            return
+
+        say_path = shutil.which("say")
+        if not say_path:
+            self._send_json({"ok": False, "error": "System voice is unavailable on this machine."})
+            return
+
+        global SPEECH_PROCESS
+        _stop_speech_process()
+        SPEECH_PROCESS = subprocess.Popen(
+            [say_path, text],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        self._send_json({"ok": True, "engine": "macos-say"})
+
+    def _stop_local_speech(self) -> None:
+        _stop_speech_process()
+        self._send_json({"ok": True})
+
     def _proxy_rasa_message(self) -> None:
         length = int(self.headers.get("Content-Length", "0"))
         payload = json.loads(self.rfile.read(length) or b"{}")
         message = payload.get("message", "")
         sender = payload.get("sender", "web-demo")
+        fallback = _local_advisor_reply(message, payload.get("context", {}))
         rasa_payload = json.dumps({"sender": sender, "message": message}).encode("utf-8")
         request = Request(
             "http://127.0.0.1:5005/webhooks/rest/webhook",
@@ -98,15 +136,27 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
             method="POST",
         )
         try:
-            with urlopen(request, timeout=30) as response:
+            with urlopen(request, timeout=RASA_REPLY_TIMEOUT_SECONDS) as response:
                 body = response.read()
         except (OSError, URLError) as exc:
-            body = json.dumps(
-                {
-                    "error": "Rasa is not reachable. Start it with `make rasa` while `make run-actions` is running.",
-                    "detail": str(exc),
-                }
-            ).encode("utf-8")
+            fallback["rasa_status"] = f"Rasa was not reachable: {exc}"
+            body = json.dumps([fallback]).encode("utf-8")
+        else:
+            try:
+                messages = json.loads(body or b"[]")
+            except json.JSONDecodeError:
+                fallback["rasa_status"] = "Rasa returned a response the web demo could not parse."
+                body = json.dumps([fallback]).encode("utf-8")
+            else:
+                texts = [item.get("text", "") for item in messages if isinstance(item, dict)]
+                has_text = any(texts)
+                if not has_text or _is_collection_prompt(texts) or _is_unhelpful_rasa_answer(texts):
+                    fallback["rasa_status"] = (
+                        "Rasa returned no speakable answer."
+                        if not has_text
+                        else "Rasa did not use the dashboard analysis context."
+                    )
+                    body = json.dumps([fallback]).encode("utf-8")
 
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
@@ -121,6 +171,14 @@ class AuctionAdvisorHandler(BaseHTTPRequestHandler):
         body = path.read_bytes()
         self.send_response(200)
         self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _send_json(self, payload: dict[str, Any]) -> None:
+        body = json.dumps(payload).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -146,6 +204,115 @@ def _to_int(value: Any) -> int | None:
     if value in {None, ""}:
         return None
     return int(float(str(value).replace(",", "")))
+
+
+def _speech_text(value: Any) -> str:
+    return " ".join(str(value).split()).replace("$", " dollars ").replace("%", " percent ")[:900]
+
+
+def _stop_speech_process() -> None:
+    global SPEECH_PROCESS
+    if SPEECH_PROCESS and SPEECH_PROCESS.poll() is None:
+        SPEECH_PROCESS.terminate()
+    SPEECH_PROCESS = None
+
+
+def _local_advisor_reply(message: str, context: dict[str, Any] | None) -> dict[str, str]:
+    """Deterministic chat fallback for demo mode when Rasa is down or quiet."""
+    context = context or {}
+    property_overrides = {
+        "address": context.get("address") or None,
+        "city": context.get("city") or None,
+        "current_bid": _to_int(context.get("currentBid")),
+        "estimated_repairs": _to_int(context.get("estimatedRepairs")),
+        "estimated_market_rent": _to_int(context.get("marketRent")),
+    }
+    profile_overrides = {
+        "available_cash": _to_int(context.get("availableCash")),
+        "financing_type": context.get("financingType") or None,
+        "investment_goal": context.get("investmentGoal") or None,
+    }
+    analysis = analyze_auction(
+        property_id=context.get("parcelId") or "6013-fender-court",
+        property_overrides=property_overrides,
+        profile_overrides=profile_overrides,
+        use_official_data=_wants_live_official_data(context),
+    )
+    update_buyer_profile(profile_overrides)
+    save_analysis(analysis)
+
+    prompt = message.lower()
+    rec = analysis.recommendation
+    buying = analysis.buying_power
+    hidden = analysis.hidden_costs
+    rental = analysis.rental_yield
+    prop = analysis.property_data
+
+    prefix = "Demo fallback answer: "
+    if any(term in prompt for term in ("max", "maximum", "safe bid", "bid above")):
+        answer = (
+            f"{prefix}your maximum safe bid is ${rec.max_safe_bid:,.0f}. "
+            f"I would not bid above ${rec.do_not_bid_above:,.0f}. "
+            f"At the current bid of ${prop['current_bid']:,.0f}, cash needed is about "
+            f"${buying.cash_needed_at_current_bid:,.0f}, leaving "
+            f"${buying.remaining_cash_at_current_bid:,.0f} after deposit, closing costs, "
+            "repairs, and reserve."
+        )
+    elif any(term in prompt for term in ("wrong", "risk", "risks", "cost", "lien", "title")):
+        top_risks = [
+            item["source"]
+            for item in hidden.checklist
+            if item["risk_level"] == "high" and item["status"] in {"risk_found", "needs_review", "not_checked"}
+        ][:3]
+        answer = (
+            f"{prefix}the main issue is {rec.biggest_risk}. "
+            f"{hidden.summary} Highest-priority checks: {', '.join(top_risks)}. "
+            "Do those before placing a live bid."
+        )
+    else:
+        answer = (
+            f"{prefix}{rec.category}. {rec.summary} "
+            f"The rental estimate is ${rental.monthly_cash_flow:,.0f} per month at the current bid, "
+            f"with a {rental.cap_rate:.1%} cap rate. "
+            f"The biggest risk is {rec.biggest_risk}."
+        )
+
+    return {"text": answer, "source": "local-demo-fallback"}
+
+
+def _wants_live_official_data(payload: dict[str, Any]) -> bool:
+    return str(payload.get("useOfficialData", "")).lower() in {"1", "true", "yes", "on"}
+
+
+def _is_collection_prompt(texts: list[str]) -> bool:
+    collection_phrases = (
+        "what repair budget",
+        "what monthly rent",
+        "what is the current bid",
+        "how much cash",
+        "how would you finance",
+        "what property address",
+        "what city or county",
+        "are you evaluating this",
+    )
+    combined = " ".join(texts).lower()
+    return any(phrase in combined for phrase in collection_phrases)
+
+
+def _is_unhelpful_rasa_answer(texts: list[str]) -> bool:
+    combined = " ".join(texts).lower()
+    unhelpful_phrases = (
+        "can't determine",
+        "can't calculate",
+        "cannot determine",
+        "cannot calculate",
+        "don't have access",
+        "don't have enough",
+        "do not have enough",
+        "needed to figure out",
+        "provide a repair budget",
+    )
+    return any(phrase in combined for phrase in unhelpful_phrases)
 
 
 if __name__ == "__main__":

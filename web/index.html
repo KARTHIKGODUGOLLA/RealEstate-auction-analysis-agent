@@ -22,6 +22,9 @@
           <button id="voiceReplyToggle" class="voice-reply-toggle" type="button" aria-pressed="true">
             Voice replies on
           </button>
+          <button id="testVoice" class="voice-reply-toggle" type="button">
+            Test voice
+          </button>
           <p id="voiceStatus">Ask out loud. The advisor will answer in chat and read the response back.</p>
         </div>
       </section>
@@ -94,15 +97,18 @@
         <section class="results">
           <section class="rasa-panel">
             <div class="section-heading">
-              <p class="label">Rasa conversation</p>
-              <h3>Auction advisor chat</h3>
+              <div>
+                <p class="label">Rasa conversation</p>
+                <h3>Auction advisor chat</h3>
+              </div>
+              <button id="clearChat" class="ghost-button" type="button">Clear chat</button>
             </div>
             <div class="quick-actions">
               <button id="askDecision" type="button">Should I bid?</button>
               <button id="askRisks" type="button">What could go wrong?</button>
               <button id="askMaxBid" type="button">Explain max bid</button>
             </div>
-            <div id="rasaTranscript" class="rasa-transcript">
+            <div id="rasaTranscript" class="rasa-transcript" aria-live="polite">
               <div class="message agent">Select a property, then ask me whether to bid. I will use the selected deal details and your buyer profile.</div>
             </div>
             <div class="rasa-compose">
